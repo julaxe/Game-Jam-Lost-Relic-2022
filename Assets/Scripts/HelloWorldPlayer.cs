@@ -17,9 +17,7 @@ public class HelloWorldPlayer : NetworkBehaviour
     {
         if (NetworkManager.Singleton.IsServer)
         {
-            var randomPosition = GetRandomPositionOnPlane();
-            transform.position = randomPosition;
-            Position.Value = randomPosition;
+            ServerPositionRequest();
         }
         else
         {
@@ -27,6 +25,12 @@ public class HelloWorldPlayer : NetworkBehaviour
         }
     }
 
+    void ServerPositionRequest()
+    {
+        var randomPosition = GetRandomPositionOnPlane();
+        transform.position = randomPosition;
+        Position.Value = randomPosition;
+    }
     [ServerRpc]
     void SubmitPositionRequestServerRpc(ServerRpcParams rpcParams = default)
     {

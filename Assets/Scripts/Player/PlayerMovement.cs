@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : NetworkBehaviour
 {
-    public NetworkVariable<Vector3> Position = new NetworkVariable<Vector3>();
+    public NetworkVariable<Vector2> Position = new NetworkVariable<Vector2>();
 
 
 
@@ -15,37 +15,16 @@ public class PlayerMovement : NetworkBehaviour
     private InputAction m_movement, m_destroy, m_pickup;
     private Vector2 m_InputDirection;
     [SerializeField] private float m_speed;
-
-    public override void OnNetworkSpawn()
-    {
-        if (IsOwner)
-        {
-            Move();
-        }
-    }
-
-    public void Move()
-    {
-        if (NetworkManager.Singleton.IsServer)
-        {
-            ServerPositionRequest();
-        }
-        else
-        {
-            SubmitPositionRequestServerRpc();
-        }
-    }
+    
 
     void ServerPositionRequest()
     {
-        var randomPosition = GetRandomPositionOnPlane();
-        transform.position = randomPosition;
-        Position.Value = randomPosition;
+        Position.Value = (Vector2)transform.position + m_InputDirection * m_speed * Time.deltaTime;
     }
     [ServerRpc]
     void SubmitPositionRequestServerRpc(ServerRpcParams rpcParams = default)
     {
-        Position.Value = GetRandomPositionOnPlane();
+        Position.Value = (Vector2)transform.position + m_InputDirection * m_speed * Time.deltaTime;
     }
 
     static Vector3 GetRandomPositionOnPlane()
@@ -55,34 +34,28 @@ public class PlayerMovement : NetworkBehaviour
 
     void Update()
     {
-        //if (m_inputs != null) { return; }
-        //m_InputDirection = m_movement.ReadValue<Vector2>(); 
-        
-        Movement();
+        if (m_InputDirection.SqrMagnitude() != 0)
+        {
+            if (NetworkManager.Singleton.IsServer)
+            {
+                ServerPositionRequest();
+            }
+            else
+            {
+                SubmitPositionRequestServerRpc();
+            }
+            transform.position = Position.Value;
+        }
     }
-
-    //public void Setinputs(PlayerInput playerInput)
-    //{
-    //    m_inputs = playerInput;
-
-    //    m_movement = m_inputs.actions["Movement"];
-    //    //m_destroy = m_inputs.actions["Destroy"];
-    //    //m_pickup = m_inputs.actions["Pickup"];
-
-
-
-
-    //}
-    [ServerRpc]
-    private void Movement()
-    {
-        transform.position += new Vector3(m_InputDirection.x, m_InputDirection.y, 0) * m_speed * Time.deltaTime;
-            
-    }
+    
 
     public void OnMovement(InputValue a)
     {
-        m_InputDirection = a.Get<Vector2>(); 
+        if (!IsOwner) return;
+        
+        m_InputDirection = a.Get<Vector2>();
+        
+        
     }
 
 }

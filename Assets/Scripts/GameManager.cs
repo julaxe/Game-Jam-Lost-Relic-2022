@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour
     
     //Setup events
     public UnityAction<string> UpdateState;
-    public UnityAction MatchFound;
+    public UnityAction<string> MatchFound;
     
     private void Awake()
     {
@@ -151,7 +151,7 @@ public class GameManager : MonoBehaviour
             // Finally start the client
             NetworkManager.Singleton.StartClient();
             UpdateState?.Invoke("Match found!");
-            MatchFound?.Invoke();
+            MatchFound?.Invoke("client");
         }
         catch (LobbyServiceException e)
         {
@@ -224,6 +224,7 @@ public class GameManager : MonoBehaviour
             //Finally start host
             NetworkManager.Singleton.StartHost();
             UpdateState?.Invoke("Waiting for players...");
+            MatchFound?.Invoke("host");
         }
         catch (LobbyServiceException e)
         {

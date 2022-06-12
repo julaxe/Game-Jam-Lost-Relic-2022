@@ -7,6 +7,7 @@ public class UIManager : MonoBehaviour
 {
     public TextMeshProUGUI statusText;
     public GameObject playButton;
+    public GameObject startGameButton;
     void Start()
     {
         GameManager.Instance.UpdateState += UpdateText;
@@ -18,8 +19,12 @@ public class UIManager : MonoBehaviour
         statusText.text = text;
     }
 
-    public void MatchFound()
+    public void MatchFound(string message)
     {
         playButton.SetActive(false);
+        if (message == "host")
+        {
+            startGameButton.SetActive(true);
+        }
     }
 }

@@ -18,6 +18,10 @@ public class GameManager : MonoBehaviour
 
     private RelayHostData _hostData;
     private RelayJoinData _joinData;
+
+    public bool IsRelayEnabled => Transport != null &&
+                                  Transport.Protocol == UnityTransport.ProtocolType.RelayUnityTransport;
+    public UnityTransport Transport => NetworkManager.Singleton.gameObject.GetComponent<UnityTransport>();
     async void Start()
     {
         //initialize unity services
@@ -72,7 +76,7 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Lobby
-
+    
     public async void FindMatch()
     {
         Debug.Log("Looking for a lobby...");
@@ -137,8 +141,14 @@ public class GameManager : MonoBehaviour
         
         try
         {
+            
             Debug.Log("Creating Relay Object...");
             //Create Relay object
+
+            if (IsRelayEnabled)
+            {
+                Debug.Log("Relay is enabled");
+            }
             
             Allocation allocation = await Relay.Instance.CreateAllocationAsync(maxConnections);
             

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
@@ -10,18 +11,42 @@ using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class GameManager : MonoBehaviour
 {
+    // Singleton
+    public static GameManager _instance;
+    public static GameManager Instance => _instance;
+    
     private string _lobbyId;
 
     private RelayHostData _hostData;
     private RelayJoinData _joinData;
-
+    
     public bool IsRelayEnabled => Transport != null &&
                                   Transport.Protocol == UnityTransport.ProtocolType.RelayUnityTransport;
     public UnityTransport Transport => NetworkManager.Singleton.gameObject.GetComponent<UnityTransport>();
+
+    
+    //Setup events
+    public UnityAction<string> UpdateState;
+    public UnityAction MatchFound;
+    
+    private void Awake()
+    {
+        // just a basic singleton
+        if (_instance is null)
+        {
+            _instance = this;
+            return;
+        }
+
+        Destroy(this);
+    }
+
     async void Start()
     {
         //initialize unity services
@@ -81,6 +106,7 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Looking for a lobby...");
 
+        UpdateState?.Invoke("Looking for a lobby");
         try
         {
             //looking for a lobby
@@ -124,9 +150,12 @@ public class GameManager : MonoBehaviour
             
             // Finally start the client
             NetworkManager.Singleton.StartClient();
+            UpdateState?.Invoke("Match found!");
+            MatchFound?.Invoke();
         }
         catch (LobbyServiceException e)
         {
+            UpdateState?.Invoke("Couldn't find a lobby - creating a lobby");
             Debug.Log($"Cannot find a lobby: {e}");
             CreateMatch();
         }
@@ -145,11 +174,6 @@ public class GameManager : MonoBehaviour
             Debug.Log("Creating Relay Object...");
             //Create Relay object
 
-            if (IsRelayEnabled)
-            {
-                Debug.Log("Relay is enabled");
-            }
-            
             Allocation allocation = await Relay.Instance.CreateAllocationAsync(maxConnections);
             
             _hostData = new RelayHostData
@@ -199,6 +223,7 @@ public class GameManager : MonoBehaviour
             
             //Finally start host
             NetworkManager.Singleton.StartHost();
+            UpdateState?.Invoke("Waiting for players...");
         }
         catch (LobbyServiceException e)
         {

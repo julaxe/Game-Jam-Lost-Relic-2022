@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 public class PlayerBehavior : MonoBehaviour
 {
-    private RoundType m_currentRound;
+    public RoundType m_currentRound;
     public GameObject m_itemHeld;
 
     public GameObject m_CurrentItemPossessed;
@@ -15,6 +15,7 @@ public class PlayerBehavior : MonoBehaviour
     void Start()
     {
         m_currentRound = RoundType.PossessionRound;
+        RoundManager.StartRoundEvent += ChangeRound;
     }
 
     // Update is called once per frame
@@ -71,6 +72,11 @@ public class PlayerBehavior : MonoBehaviour
         {
             m_itemInRange = null;
         }
+    }
+
+    private void ChangeRound()
+    {
+        m_currentRound = RoundType.SeekingRound;
     }
 
 }

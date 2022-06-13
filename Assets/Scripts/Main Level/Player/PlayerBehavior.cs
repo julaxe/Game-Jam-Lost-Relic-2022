@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using Main_Level;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
-public class PlayerBehavior : MonoBehaviour
+public class PlayerBehavior : NetworkBehaviour
 {
     public RoundType m_currentRound;
     public GameObject m_itemHeld;
@@ -39,28 +41,33 @@ public class PlayerBehavior : MonoBehaviour
 
     public void OnPickup(InputValue a)
     {
+        if (!IsOwner) return;
         if (m_itemHeld != null)
         {
-            m_itemHeld.GetComponentInChildren<SpriteRenderer>().sortingLayerName = "Default";
-            m_itemHeld.transform.SetParent(null);
-            m_itemHeld = null;
+            DropItem();
             return;
         }
 
         if (m_itemInRange == null) { return; }
 
-        
+        PickUpItem();
+    }
 
+    void DropItem()
+    {
+        m_itemHeld.GetComponent<Item>().UnbindPlayer();
+        m_itemHeld = null;
+    }
+
+    void PickUpItem()
+    {
         m_itemHeld = m_itemInRange;
-        m_itemInRange.transform.SetParent(this.transform);
-        m_itemInRange.transform.localPosition = new Vector3(0, -0.5f);
-        m_itemInRange.GetComponentInChildren<SpriteRenderer>().sortingLayerName = "HeldItem";
-
+        m_itemHeld.GetComponent<Item>().BindPlayer(this.gameObject);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.tag == "Item")
+        if (collision.CompareTag("Item"))
         {
             m_itemInRange = collision.gameObject;
         }
@@ -68,7 +75,7 @@ public class PlayerBehavior : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.tag == "Item")
+        if (collision.CompareTag("Item"))
         {
             m_itemInRange = null;
         }

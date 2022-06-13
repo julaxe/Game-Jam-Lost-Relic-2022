@@ -214,6 +214,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0fae1c37a45d4b449837c71428f8ff9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_currentRound: 0
   m_itemHeld: {fileID: 0}
   m_CurrentItemPossessed: {fileID: 0}
   m_itemInRange: {fileID: 0}
@@ -242,4 +243,4 @@ MonoBehaviour:
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
   InLocalSpace: 0
-  Interpolate: 0
+  Interpolate: 1

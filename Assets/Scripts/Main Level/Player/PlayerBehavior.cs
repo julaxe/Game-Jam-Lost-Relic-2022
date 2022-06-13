@@ -40,6 +40,7 @@ public class PlayerBehavior : MonoBehaviour
     {
         if (m_itemHeld != null)
         {
+            m_itemHeld.GetComponentInChildren<SpriteRenderer>().sortingLayerName = "Default";
             m_itemHeld.transform.SetParent(null);
             m_itemHeld = null;
             return;
@@ -51,6 +52,8 @@ public class PlayerBehavior : MonoBehaviour
 
         m_itemHeld = m_itemInRange;
         m_itemInRange.transform.SetParent(this.transform);
+        m_itemInRange.transform.localPosition = new Vector3(0, -0.5f);
+        m_itemInRange.GetComponentInChildren<SpriteRenderer>().sortingLayerName = "HeldItem";
 
     }
 

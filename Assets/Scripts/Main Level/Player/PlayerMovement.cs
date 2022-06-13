@@ -13,24 +13,29 @@ public class PlayerMovement : NetworkBehaviour
     private InputAction m_movement, m_destroy, m_pickup;
     [SerializeField] private Vector2 m_InputDirection;
     [SerializeField] private float m_speed;
-    
+
     void UpdateServer()
     {
         if (InputDirection.Value.sqrMagnitude != 0.0f)
         {
+            if (m_InputDirection.x != 0)
+            {
+                transform.localScale = new Vector2(-m_InputDirection.x, 1);
+            }
+
             Vector2 newPos = (Vector2)transform.position + InputDirection.Value * m_speed * Time.deltaTime;
             transform.position = newPos;
         }
     }
-    
+
 
     private void UpdateClient()
     {
         //Vector2 newPos = (Vector2) transform.position + (m_InputDirection * m_speed * Time.deltaTime);
         SubmitPositionRequestServerRpc(m_InputDirection);
     }
-    
-    
+
+
     void Update()
     {
         if (IsOwner && IsClient)
@@ -39,12 +44,12 @@ public class PlayerMovement : NetworkBehaviour
         }
         UpdateServer();
     }
-    
+
     public void OnMovement(InputValue a)
     {
         m_InputDirection = a.Get<Vector2>();
     }
-    
+
     [ServerRpc]
     void SubmitPositionRequestServerRpc(Vector2 newPosition)
     {

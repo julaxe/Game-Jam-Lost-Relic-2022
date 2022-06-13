@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: -8153675911151557357}
   - component: {fileID: -5081240526065691203}
   - component: {fileID: -3578845575376168162}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: ItemTemplate
-  m_TagString: Untagged
+  m_TagString: Item
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -99,7 +99,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7356272100728552953}
   - component: {fileID: 6268612987633874803}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}

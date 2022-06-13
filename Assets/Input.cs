@@ -46,7 +46,7 @@ public partial class @Input : IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Destroy"",
+                    ""name"": ""DestroyPossess"",
                     ""type"": ""Button"",
                     ""id"": ""1044edcd-4251-4f90-9fe7-0d560e291a4c"",
                     ""expectedControlType"": ""Button"",
@@ -126,10 +126,10 @@ public partial class @Input : IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""ed29424d-d848-48ca-a751-96e295161a58"",
                     ""path"": ""<Keyboard>/space"",
-                    ""interactions"": """",
+                    ""interactions"": ""Press"",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Destroy"",
+                    ""action"": ""DestroyPossess"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -142,7 +142,7 @@ public partial class @Input : IInputActionCollection2, IDisposable
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Movement = m_Player.FindAction("Movement", throwIfNotFound: true);
         m_Player_Pickup = m_Player.FindAction("Pickup", throwIfNotFound: true);
-        m_Player_Destroy = m_Player.FindAction("Destroy", throwIfNotFound: true);
+        m_Player_DestroyPossess = m_Player.FindAction("DestroyPossess", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -204,14 +204,14 @@ public partial class @Input : IInputActionCollection2, IDisposable
     private IPlayerActions m_PlayerActionsCallbackInterface;
     private readonly InputAction m_Player_Movement;
     private readonly InputAction m_Player_Pickup;
-    private readonly InputAction m_Player_Destroy;
+    private readonly InputAction m_Player_DestroyPossess;
     public struct PlayerActions
     {
         private @Input m_Wrapper;
         public PlayerActions(@Input wrapper) { m_Wrapper = wrapper; }
         public InputAction @Movement => m_Wrapper.m_Player_Movement;
         public InputAction @Pickup => m_Wrapper.m_Player_Pickup;
-        public InputAction @Destroy => m_Wrapper.m_Player_Destroy;
+        public InputAction @DestroyPossess => m_Wrapper.m_Player_DestroyPossess;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -227,9 +227,9 @@ public partial class @Input : IInputActionCollection2, IDisposable
                 @Pickup.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPickup;
                 @Pickup.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPickup;
                 @Pickup.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPickup;
-                @Destroy.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnDestroy;
-                @Destroy.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnDestroy;
-                @Destroy.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnDestroy;
+                @DestroyPossess.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnDestroyPossess;
+                @DestroyPossess.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnDestroyPossess;
+                @DestroyPossess.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnDestroyPossess;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -240,9 +240,9 @@ public partial class @Input : IInputActionCollection2, IDisposable
                 @Pickup.started += instance.OnPickup;
                 @Pickup.performed += instance.OnPickup;
                 @Pickup.canceled += instance.OnPickup;
-                @Destroy.started += instance.OnDestroy;
-                @Destroy.performed += instance.OnDestroy;
-                @Destroy.canceled += instance.OnDestroy;
+                @DestroyPossess.started += instance.OnDestroyPossess;
+                @DestroyPossess.performed += instance.OnDestroyPossess;
+                @DestroyPossess.canceled += instance.OnDestroyPossess;
             }
         }
     }
@@ -251,6 +251,6 @@ public partial class @Input : IInputActionCollection2, IDisposable
     {
         void OnMovement(InputAction.CallbackContext context);
         void OnPickup(InputAction.CallbackContext context);
-        void OnDestroy(InputAction.CallbackContext context);
+        void OnDestroyPossess(InputAction.CallbackContext context);
     }
 }

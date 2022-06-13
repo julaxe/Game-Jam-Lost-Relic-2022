@@ -24,7 +24,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Destroy",
+                    "name": "DestroyPossess",
                     "type": "Button",
                     "id": "1044edcd-4251-4f90-9fe7-0d560e291a4c",
                     "expectedControlType": "Button",
@@ -104,10 +104,10 @@
                     "name": "",
                     "id": "ed29424d-d848-48ca-a751-96e295161a58",
                     "path": "<Keyboard>/space",
-                    "interactions": "",
+                    "interactions": "Press",
                     "processors": "",
                     "groups": "",
-                    "action": "Destroy",
+                    "action": "DestroyPossess",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

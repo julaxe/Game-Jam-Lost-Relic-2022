@@ -1,61 +1,54 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
 
 public class PlayerMovement : NetworkBehaviour
 {
-    public NetworkVariable<Vector2> Position = new NetworkVariable<Vector2>();
+    public NetworkVariable<Vector2> InputDirection = new NetworkVariable<Vector2>();
 
 
 
     [Header("Input")]
     private PlayerInput m_inputs;
     private InputAction m_movement, m_destroy, m_pickup;
-    private Vector2 m_InputDirection;
+    [SerializeField] private Vector2 m_InputDirection;
     [SerializeField] private float m_speed;
     
-
-    void ServerPositionRequest()
+    void UpdateServer()
     {
-        Position.Value = (Vector2)transform.position + m_InputDirection * m_speed * Time.deltaTime;
-    }
-    [ServerRpc]
-    void SubmitPositionRequestServerRpc(ServerRpcParams rpcParams = default)
-    {
-        Position.Value = (Vector2)transform.position + m_InputDirection * m_speed * Time.deltaTime;
-    }
-
-    static Vector3 GetRandomPositionOnPlane()
-    {
-        return new Vector3(Random.Range(-3f, 3f), 1f, Random.Range(-3f, 3f));
-    }
-
-    void Update()
-    {
-        if (m_InputDirection.SqrMagnitude() != 0)
+        if (InputDirection.Value.sqrMagnitude != 0.0f)
         {
-            if (NetworkManager.Singleton.IsServer)
-            {
-                ServerPositionRequest();
-            }
-            else
-            {
-                SubmitPositionRequestServerRpc();
-            }
-            transform.position = Position.Value;
+            Vector2 newPos = (Vector2)transform.position + InputDirection.Value * m_speed * Time.deltaTime;
+            transform.position = newPos;
         }
     }
     
 
+    private void UpdateClient()
+    {
+        //Vector2 newPos = (Vector2) transform.position + (m_InputDirection * m_speed * Time.deltaTime);
+        SubmitPositionRequestServerRpc(m_InputDirection);
+    }
+    
+    
+    void Update()
+    {
+        if (IsOwner && IsClient)
+        {
+            UpdateClient();
+        }
+        UpdateServer();
+    }
+    
     public void OnMovement(InputValue a)
     {
-        if (!IsOwner) return;
-        
         m_InputDirection = a.Get<Vector2>();
-        
-        
+    }
+    
+    [ServerRpc]
+    void SubmitPositionRequestServerRpc(Vector2 newPosition)
+    {
+        InputDirection.Value = newPosition;
     }
 
 }

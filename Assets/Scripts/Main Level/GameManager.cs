@@ -166,7 +166,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("Creating a new lobby...");
 
         //External connections
-        int maxConnections = 1;
+        int maxConnections = 5;
         
         try
         {
@@ -190,7 +190,7 @@ public class GameManager : MonoBehaviour
             _hostData.JoinCode = await Relay.Instance.GetJoinCodeAsync(allocation.AllocationId);
 
             string lobbyName = "game_lobby";
-            int maxPlayers = 2;
+            int maxPlayers = 5;
             CreateLobbyOptions options = new CreateLobbyOptions();
             options.IsPrivate = false;
 

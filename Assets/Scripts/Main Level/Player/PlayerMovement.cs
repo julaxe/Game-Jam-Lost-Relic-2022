@@ -18,9 +18,13 @@ public class PlayerMovement : NetworkBehaviour
     {
         if (InputDirection.Value.sqrMagnitude != 0.0f)
         {
-            if (m_InputDirection.x != 0)
+            if (InputDirection.Value.x > 0)
             {
-                transform.localScale = new Vector2(-m_InputDirection.x, 1);
+                transform.localScale = new Vector2(-1, 1);
+            } 
+            else if (InputDirection.Value.x < 0)
+            {
+                transform.localScale = new Vector2(1, 1);
             }
 
             Vector2 newPos = (Vector2)transform.position + InputDirection.Value * m_speed * Time.deltaTime;
@@ -55,5 +59,6 @@ public class PlayerMovement : NetworkBehaviour
     {
         InputDirection.Value = newPosition;
     }
+    
 
 }

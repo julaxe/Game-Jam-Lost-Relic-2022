@@ -4,8 +4,12 @@ using Main_Level;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System;
 public class PlayerBehavior : NetworkBehaviour
 {
+    public static event Action PlayHasItem;
+
+
     public RoundType m_currentRound;
     public GameObject m_itemHeld;
 
@@ -25,12 +29,12 @@ public class PlayerBehavior : NetworkBehaviour
     {
         
     }
-    public void OnDestroypPossess(InputValue a)
+    public void OnDestroyPossess(InputValue a)
     {
         if(m_itemHeld == null) { return; }
         if(m_currentRound == RoundType.PossessionRound)
         {
-            m_itemHeld = m_CurrentItemPossessed;
+             m_CurrentItemPossessed = m_itemHeld;
         }
         else
         {
@@ -89,7 +93,31 @@ public class PlayerBehavior : NetworkBehaviour
             return;
         }
 
-        m_currentRound++; 
+        m_currentRound++;
+
+        if (m_currentRound == RoundType.SeekingRound)
+        {
+            if (m_CurrentItemPossessed == null)
+            {
+                Debug.Log("No Item");
+                //Looking for nearest item
+                float tempDistance = 1000;
+                GameObject[] tempArray = GameObject.FindGameObjectsWithTag("Item");
+                for (int i = 0; i < tempArray.Length; i++)
+                {
+                    if(tempDistance > Vector3.Distance(transform.position, tempArray[i].transform.position))
+                    {
+                        tempDistance = Vector3.Distance(transform.position, tempArray[i].transform.position);
+                        m_CurrentItemPossessed = tempArray[i];
+                    }
+                }
+
+
+            }
+
+            PlayHasItem?.Invoke();
+
+        }
     }
 
 }

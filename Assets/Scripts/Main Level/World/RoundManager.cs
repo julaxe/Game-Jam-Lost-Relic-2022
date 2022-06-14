@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using Unity.Netcode;
+using TMPro;
 public enum RoundType
 {
     WaitingRoom,
@@ -14,15 +15,18 @@ public class RoundManager : NetworkBehaviour
 {
     public static event Action NextRound;
     public NetworkVariable<RoundType> m_changeRound = new NetworkVariable<RoundType>();
+    public NetworkVariable<int> numberOfPlayersLeft = new NetworkVariable<int>();
+
 
 
     [Header("Round Settings")]
     [SerializeField]
     private float m_possessionRoundAmountOfTime;
     private RoundType m_currentRound;
-    
-
-
+    [SerializeField]
+    private GameObject startGameButton;
+    [SerializeField]
+    private GameObject NumberOfPlayerLeftGUI;
 
     private void Awake()
     {
@@ -32,6 +36,9 @@ public class RoundManager : NetworkBehaviour
     void Start()
     {
         m_changeRound.Value = RoundType.WaitingRoom;
+        
+        PlayerBehavior.PlayHasItem += addNumberPlayers;
+
     }
 
     // Update is called once per frame
@@ -52,17 +59,23 @@ public class RoundManager : NetworkBehaviour
             case RoundType.PossessionRound:
 
                 if (m_changeRound.Value == m_currentRound) { return; }
-
+                
+                NumberOfPlayerLeftGUI.SetActive(true);
                 m_currentRound = RoundType.SeekingRound;
                 NextRound?.Invoke();
+                
 
                 break;
             case RoundType.SeekingRound:
+
+                NumberOfPlayerLeftGUI.GetComponent<TextMeshProUGUI>().text = "Number Of Players: " + numberOfPlayersLeft.Value.ToString();
 
                 if (m_changeRound.Value == m_currentRound) { return; }
 
                 m_currentRound = RoundType.EndGame;
                 NextRound?.Invoke();
+                NumberOfPlayerLeftGUI.SetActive(false);
+
 
                 break;
             case RoundType.EndGame:
@@ -76,12 +89,14 @@ public class RoundManager : NetworkBehaviour
     {
         StartCoroutine(StartPossessionRound());
         Debug.Log("Game Started");
+        startGameButton.SetActive(false);
     }
 
 
     IEnumerator StartPossessionRound()
     {
         m_currentRound = RoundType.PossessionRound;
+        NextRound?.Invoke();
         SubmitEventRequestServerRpc(RoundType.PossessionRound);
 
         yield return new WaitForSeconds(m_possessionRoundAmountOfTime);
@@ -90,6 +105,7 @@ public class RoundManager : NetworkBehaviour
         m_currentRound = RoundType.SeekingRound;
         NextRound?.Invoke();
         SubmitEventRequestServerRpc(RoundType.SeekingRound);
+        NumberOfPlayerLeftGUI.SetActive(true);
     }
 
     [ServerRpc]
@@ -97,5 +113,19 @@ public class RoundManager : NetworkBehaviour
     {
         m_changeRound.Value = a;
     }
+
+    public void addNumberPlayers()
+    {
+        numberOfPlayersLeft.Value++;
+    }
+
+//     if(numberOfPlayersLeft == 1)
+//        {
+//            NextRound?.Invoke();
+//    SubmitEventRequestServerRpc(RoundType.EndGame);
+//}
+
+
+    
 
 }

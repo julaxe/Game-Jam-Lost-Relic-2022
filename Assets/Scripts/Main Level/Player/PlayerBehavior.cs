@@ -8,6 +8,7 @@ using System;
 public class PlayerBehavior : NetworkBehaviour
 {
     public static event Action PlayHasItem;
+    public static event Action GameOver;
 
     public NetworkVariable<int> itemId = new NetworkVariable<int>();
 
@@ -18,12 +19,13 @@ public class PlayerBehavior : NetworkBehaviour
     public GameObject m_CurrentItemPossessed;
 
     public GameObject m_itemInRange;
+    public bool playerLost;
 
-     
 
     // Start is called before the first frame update
     void Start()
     {
+        playerLost = false;
         m_currentRound = RoundType.WaitingRoom;
         RoundManager.NextRound += ChangeRound;
         if (IsOwner)
@@ -33,37 +35,34 @@ public class PlayerBehavior : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-     
-        if(itemId.Value != 0)
+
+        if (itemId.Value != 0)
         {
-            GameObject[] tempArray = GameObject.FindGameObjectsWithTag("Item");
-            for (int i = 0; i < tempArray.Length; i++)
-            {
-                if(tempArray[i].GetComponent<Item>().IdNumber == itemId.Value)
-                {
-                    Destroy(tempArray[i].gameObject);
-                }
-            }
+            RemoveItemFromGame(itemId.Value);
         }
     }
     public void OnDestroyPossess(InputValue a)
     {
-        if(m_itemHeld == null) { return; }
-        if(m_currentRound == RoundType.PossessionRound)
+
+        if (m_itemHeld == null || playerLost) { return; }
+        if (m_currentRound == RoundType.PossessionRound)
         {
-             m_CurrentItemPossessed = m_itemHeld;
+            m_CurrentItemPossessed = m_itemHeld;
+            m_CurrentItemPossessed.GetComponent<Item>().AddPlayerToPossessList(this.gameObject);
         }
         else
         {
-            if(IsOwner)
+            if (IsOwner)
                 SubmitItemIDRequestServerRpc(m_itemHeld.GetComponent<Item>().IdNumber);
-            
+
+            RemoveItemFromGame(m_itemHeld.GetComponent<Item>().IdNumber);
             m_itemHeld = null;
         }
     }
 
     public void OnPickup(InputValue a)
     {
+        if (playerLost) { return; }
         if (!IsOwner) return;
         if (m_itemHeld != null)
         {
@@ -106,13 +105,14 @@ public class PlayerBehavior : NetworkBehaviour
 
     private void ChangeRound()
     {
-        if(m_currentRound == RoundType.EndGame)
+        m_currentRound++;
+        if (m_currentRound == RoundType.ResetGame)
         {
             m_currentRound = RoundType.WaitingRoom;
+            playerLost = false;
             return;
         }
 
-        m_currentRound++;
 
         if (m_currentRound == RoundType.SeekingRound)
         {
@@ -124,20 +124,43 @@ public class PlayerBehavior : NetworkBehaviour
                 GameObject[] tempArray = GameObject.FindGameObjectsWithTag("Item");
                 for (int i = 0; i < tempArray.Length; i++)
                 {
-                    if(tempDistance > Vector3.Distance(transform.position, tempArray[i].transform.position))
+                    if (tempDistance > Vector3.Distance(transform.position, tempArray[i].transform.position))
                     {
                         tempDistance = Vector3.Distance(transform.position, tempArray[i].transform.position);
                         m_CurrentItemPossessed = tempArray[i];
+
                     }
                 }
 
 
             }
-
+            m_CurrentItemPossessed.GetComponent<Item>().AddPlayerToPossessList(this.gameObject);
             PlayHasItem?.Invoke();
 
         }
 
+    }
+
+    private void RemoveItemFromGame(int idNum)
+    {
+        GameObject[] tempArray = GameObject.FindGameObjectsWithTag("Item");
+        for (int i = 0; i < tempArray.Length; i++)
+        {
+            if (tempArray[i].GetComponent<Item>().IdNumber == idNum)
+            {
+                List<GameObject> tempPlayerList = tempArray[i].GetComponent<Item>().GetPossessList();
+                for (int j = 0; j < tempPlayerList.Count; j++)
+                {
+                    tempPlayerList[j].GetComponent<PlayerBehavior>().playerLost = true;
+                    tempPlayerList[j].GetComponent<PlayerBehavior>().m_CurrentItemPossessed = null;
+
+                    GameOver?.Invoke();
+                }
+                Destroy(tempArray[i].gameObject);
+                itemId.Value = 0;
+                return;
+            }
+        }
     }
 
     [ServerRpc]

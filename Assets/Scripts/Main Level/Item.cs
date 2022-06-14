@@ -1,7 +1,7 @@
 using System;
 using Unity.Netcode;
 using UnityEngine;
-
+using System.Collections.Generic;
 namespace Main_Level
 {
     public class Item : NetworkBehaviour
@@ -12,6 +12,9 @@ namespace Main_Level
         private SpriteRenderer _spriteRenderer;
 
         public int IdNumber;
+
+        public List<GameObject> m_possessList;
+
         // Update is called once per frame
         private void Awake()
         {
@@ -59,6 +62,16 @@ namespace Main_Level
         public void UnbindPlayer()
         {
             _playerRef = null;
+        }
+
+        public void AddPlayerToPossessList(GameObject player)
+        {
+            m_possessList.Add(player);
+        }
+
+        public List<GameObject> GetPossessList()
+        {
+            return m_possessList;
         }
     }
 }

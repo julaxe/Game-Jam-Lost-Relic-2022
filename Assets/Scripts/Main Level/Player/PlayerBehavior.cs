@@ -16,8 +16,8 @@ public class PlayerBehavior : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        m_currentRound = RoundType.PossessionRound;
-        RoundManager.StartRoundEvent += ChangeRound;
+        m_currentRound = RoundType.WaitingRoom;
+        RoundManager.NextRound += ChangeRound;
     }
 
     // Update is called once per frame
@@ -83,7 +83,13 @@ public class PlayerBehavior : NetworkBehaviour
 
     private void ChangeRound()
     {
-        m_currentRound = RoundType.SeekingRound;
+        if(m_currentRound == RoundType.EndGame)
+        {
+            m_currentRound = RoundType.WaitingRoom;
+            return;
+        }
+
+        m_currentRound++; 
     }
 
 }

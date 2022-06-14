@@ -5,14 +5,15 @@ using System;
 using Unity.Netcode;
 public enum RoundType
 {
+    WaitingRoom,
     PossessionRound,
     SeekingRound,
     EndGame
 }
 public class RoundManager : NetworkBehaviour
 {
-    public static event Action StartRoundEvent;
-    public NetworkVariable<bool> m_changeRound = new NetworkVariable<bool>();
+    public static event Action NextRound;
+    public NetworkVariable<RoundType> m_changeRound = new NetworkVariable<RoundType>();
 
 
     [Header("Round Settings")]
@@ -30,17 +31,44 @@ public class RoundManager : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        m_changeRound.Value = false;
+        m_changeRound.Value = RoundType.WaitingRoom;
     }
 
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(m_changeRound.Value);
-        if (m_changeRound.Value)
+        //Debug.Log(m_changeRound.Value);
+        
+        switch (m_currentRound)
         {
-            StartRoundEvent?.Invoke();
-            m_changeRound.Value = false;
+            case RoundType.WaitingRoom:
+                
+                if (m_changeRound.Value == m_currentRound) { return; }
+
+                m_currentRound = RoundType.PossessionRound;
+                NextRound?.Invoke();
+                
+                break;
+            case RoundType.PossessionRound:
+
+                if (m_changeRound.Value == m_currentRound) { return; }
+
+                m_currentRound = RoundType.SeekingRound;
+                NextRound?.Invoke();
+
+                break;
+            case RoundType.SeekingRound:
+
+                if (m_changeRound.Value == m_currentRound) { return; }
+
+                m_currentRound = RoundType.EndGame;
+                NextRound?.Invoke();
+
+                break;
+            case RoundType.EndGame:
+                break;
+            default:
+                break;
         }
     }
 
@@ -54,15 +82,18 @@ public class RoundManager : NetworkBehaviour
     IEnumerator StartPossessionRound()
     {
         m_currentRound = RoundType.PossessionRound;
+        SubmitEventRequestServerRpc(RoundType.PossessionRound);
+
         yield return new WaitForSeconds(m_possessionRoundAmountOfTime);
+        
         Debug.Log("Start Seek Round");
         m_currentRound = RoundType.SeekingRound;
-        StartRoundEvent?.Invoke();
-        SubmitEventRequestServerRpc(true);
+        NextRound?.Invoke();
+        SubmitEventRequestServerRpc(RoundType.SeekingRound);
     }
 
     [ServerRpc]
-    void SubmitEventRequestServerRpc(bool a)
+    void SubmitEventRequestServerRpc(RoundType a)
     {
         m_changeRound.Value = a;
     }

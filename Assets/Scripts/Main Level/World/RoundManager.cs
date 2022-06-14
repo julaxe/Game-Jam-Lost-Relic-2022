@@ -97,14 +97,17 @@ public class RoundManager : NetworkBehaviour
     {
         m_currentRound = RoundType.PossessionRound;
         NextRound?.Invoke();
-        SubmitEventRequestServerRpc(RoundType.PossessionRound);
+        if (IsOwner)
+            SubmitEventRequestServerRpc(RoundType.PossessionRound);
 
         yield return new WaitForSeconds(m_possessionRoundAmountOfTime);
         
         Debug.Log("Start Seek Round");
         m_currentRound = RoundType.SeekingRound;
         NextRound?.Invoke();
-        SubmitEventRequestServerRpc(RoundType.SeekingRound);
+        if (IsOwner)
+            SubmitEventRequestServerRpc(RoundType.SeekingRound);
+        
         NumberOfPlayerLeftGUI.SetActive(true);
     }
 

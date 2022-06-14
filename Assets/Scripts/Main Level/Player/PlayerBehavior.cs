@@ -9,6 +9,8 @@ public class PlayerBehavior : NetworkBehaviour
 {
     public static event Action PlayHasItem;
 
+    public NetworkVariable<int> itemId = new NetworkVariable<int>();
+
 
     public RoundType m_currentRound;
     public GameObject m_itemHeld;
@@ -17,17 +19,32 @@ public class PlayerBehavior : NetworkBehaviour
 
     public GameObject m_itemInRange;
 
+     
+
     // Start is called before the first frame update
     void Start()
     {
         m_currentRound = RoundType.WaitingRoom;
         RoundManager.NextRound += ChangeRound;
+        if (IsOwner)
+            SubmitItemIDRequestServerRpc(0);
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+     
+        if(itemId.Value != 0)
+        {
+            GameObject[] tempArray = GameObject.FindGameObjectsWithTag("Item");
+            for (int i = 0; i < tempArray.Length; i++)
+            {
+                if(tempArray[i].GetComponent<Item>().IdNumber == itemId.Value)
+                {
+                    Destroy(tempArray[i].gameObject);
+                }
+            }
+        }
     }
     public void OnDestroyPossess(InputValue a)
     {
@@ -38,7 +55,9 @@ public class PlayerBehavior : NetworkBehaviour
         }
         else
         {
-            Destroy(m_itemHeld.gameObject);
+            if(IsOwner)
+                SubmitItemIDRequestServerRpc(m_itemHeld.GetComponent<Item>().IdNumber);
+            
             m_itemHeld = null;
         }
     }
@@ -118,6 +137,13 @@ public class PlayerBehavior : NetworkBehaviour
             PlayHasItem?.Invoke();
 
         }
+
+    }
+
+    [ServerRpc]
+    void SubmitItemIDRequestServerRpc(int a)
+    {
+        itemId.Value = a;
     }
 
 }

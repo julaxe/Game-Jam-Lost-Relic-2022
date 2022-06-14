@@ -395,6 +395,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3546013571956829380, guid: dc75e1edadc8ed349baf4916b3ebdd80, type: 3}
+      propertyPath: IdNumber
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 4796680605125045088, guid: dc75e1edadc8ed349baf4916b3ebdd80, type: 3}
       propertyPath: m_Name
       value: Item1 3
@@ -485,6 +489,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_changeRound:
+    m_InternalValue: 0
+  numberOfPlayersLeft:
     m_InternalValue: 0
   m_possessionRoundAmountOfTime: 10
   startGameButton: {fileID: 1800016410}
@@ -706,6 +712,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3546013571956829380, guid: db1fbad667a478b4a9c12f976af22f1a, type: 3}
+      propertyPath: IdNumber
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 4796680605125045088, guid: db1fbad667a478b4a9c12f976af22f1a, type: 3}
       propertyPath: m_Name
       value: Item1 1
@@ -772,6 +782,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3546013571956829380, guid: 4247f514ed2ef544a8b0b2eb38983d51, type: 3}
+      propertyPath: IdNumber
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 4796680605125045088, guid: 4247f514ed2ef544a8b0b2eb38983d51, type: 3}
       propertyPath: m_Name
       value: Item1 4
@@ -837,6 +851,10 @@ PrefabInstance:
     - target: {fileID: 2790270798551157560, guid: 31ecdc31591e4744082c2e2d116a431f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3546013571956829380, guid: 31ecdc31591e4744082c2e2d116a431f, type: 3}
+      propertyPath: IdNumber
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4796680605125045088, guid: 31ecdc31591e4744082c2e2d116a431f, type: 3}
       propertyPath: m_Name
@@ -1841,6 +1859,10 @@ PrefabInstance:
     - target: {fileID: 2790270798551157560, guid: 192cc818d1e050a4380273cab7b9ab48, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3546013571956829380, guid: 192cc818d1e050a4380273cab7b9ab48, type: 3}
+      propertyPath: IdNumber
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4796680605125045088, guid: 192cc818d1e050a4380273cab7b9ab48, type: 3}
       propertyPath: m_Name

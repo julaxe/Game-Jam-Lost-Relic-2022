@@ -11,6 +11,7 @@ namespace Main_Level
         private GameObject _playerRef;
         private SpriteRenderer _spriteRenderer;
 
+        public int IdNumber;
         // Update is called once per frame
         private void Awake()
         {

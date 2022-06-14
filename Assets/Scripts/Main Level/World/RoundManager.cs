@@ -9,11 +9,15 @@ public enum RoundType
     WaitingRoom,
     PossessionRound,
     SeekingRound,
-    EndGame
+    EndGame,
+    ResetGame
 }
 public class RoundManager : NetworkBehaviour
 {
     public static event Action NextRound;
+    
+
+
     public NetworkVariable<RoundType> m_changeRound = new NetworkVariable<RoundType>();
     public NetworkVariable<int> numberOfPlayersLeft = new NetworkVariable<int>();
 
@@ -27,6 +31,9 @@ public class RoundManager : NetworkBehaviour
     private GameObject startGameButton;
     [SerializeField]
     private GameObject NumberOfPlayerLeftGUI;
+    [SerializeField]
+    private GameObject GameOverUI;
+
 
     private void Awake()
     {
@@ -38,7 +45,7 @@ public class RoundManager : NetworkBehaviour
         m_changeRound.Value = RoundType.WaitingRoom;
         
         PlayerBehavior.PlayHasItem += addNumberPlayers;
-
+        PlayerBehavior.GameOver += PlayerLostRound;
     }
 
     // Update is called once per frame
@@ -75,10 +82,12 @@ public class RoundManager : NetworkBehaviour
                 m_currentRound = RoundType.EndGame;
                 NextRound?.Invoke();
                 NumberOfPlayerLeftGUI.SetActive(false);
-
+                GameOverUI.SetActive(true);
 
                 break;
             case RoundType.EndGame:
+               
+
                 break;
             default:
                 break;
@@ -122,13 +131,21 @@ public class RoundManager : NetworkBehaviour
         numberOfPlayersLeft.Value++;
     }
 
-//     if(numberOfPlayersLeft == 1)
-//        {
-//            NextRound?.Invoke();
-//    SubmitEventRequestServerRpc(RoundType.EndGame);
-//}
-
-
-    
+    public void PlayerLostRound()
+    {
+        numberOfPlayersLeft.Value--;
+        if (numberOfPlayersLeft.Value == 0 || numberOfPlayersLeft.Value == 1)
+        {
+            //
+            SubmitEventRequestServerRpc(RoundType.EndGame);
+        }
+    }
+    public void ReturnToWaitingRoom()
+    {
+        GameOverUI.SetActive(false);
+        SubmitEventRequestServerRpc(RoundType.WaitingRoom);
+        m_currentRound = RoundType.WaitingRoom;
+        NextRound?.Invoke();
+    }
 
 }

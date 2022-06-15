@@ -7,35 +7,36 @@ using UnityEngine.InputSystem;
 using System;
 public class PlayerBehavior : NetworkBehaviour
 {
-    public static event Action PlayHasItem;
-    public static event Action GameOver;
-
+    //Network Variables
     public NetworkVariable<int> itemId = new NetworkVariable<int>();
 
-
+    //Variables
     public RoundType m_currentRound;
     public GameObject m_itemHeld;
-
     public GameObject m_CurrentItemPossessed;
-
     public GameObject m_itemInRange;
     public bool playerLost;
 
+    //Events
+    public static event Action PlayHasItem;
+    public static event Action GameOver;
 
-    // Start is called before the first frame update
+
     void Start()
     {
         playerLost = false;
         m_currentRound = RoundType.WaitingRoom;
-        RoundManager.NextRound += ChangeRound;
-        if (IsOwner)
-            SubmitItemIDRequestServerRpc(0);
-    }
 
-    // Update is called once per frame
+        if (IsOwner)
+        {
+            SubmitItemIDRequestServerRpc(0);
+        }
+        
+        //Subscribing to events
+        RoundManager.NextRound += ChangeRound;
+    }
     void Update()
     {
-
         if (itemId.Value != 0)
         {
             RemoveItemFromGame(itemId.Value);
@@ -59,7 +60,6 @@ public class PlayerBehavior : NetworkBehaviour
             m_itemHeld = null;
         }
     }
-
     public void OnPickup(InputValue a)
     {
         if (playerLost) { return; }
@@ -75,34 +75,17 @@ public class PlayerBehavior : NetworkBehaviour
         PickUpItem();
     }
 
-    void DropItem()
+    private void DropItem()
     {
         m_itemHeld.GetComponent<Item>().UnbindPlayer();
         m_itemHeld = null;
     }
 
-    void PickUpItem()
+    private void PickUpItem()
     {
         m_itemHeld = m_itemInRange;
         m_itemHeld.GetComponent<Item>().BindPlayer(this.gameObject);
     }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.CompareTag("Item"))
-        {
-            m_itemInRange = collision.gameObject;
-        }
-    }
-
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (collision.CompareTag("Item"))
-        {
-            m_itemInRange = null;
-        }
-    }
-
     private void ChangeRound()
     {
         m_currentRound++;
@@ -131,8 +114,6 @@ public class PlayerBehavior : NetworkBehaviour
 
                     }
                 }
-
-
             }
             m_CurrentItemPossessed.GetComponent<Item>().AddPlayerToPossessList(this.gameObject);
             PlayHasItem?.Invoke();
@@ -140,7 +121,6 @@ public class PlayerBehavior : NetworkBehaviour
         }
 
     }
-
     private void RemoveItemFromGame(int idNum)
     {
         GameObject[] tempArray = GameObject.FindGameObjectsWithTag("Item");
@@ -160,6 +140,21 @@ public class PlayerBehavior : NetworkBehaviour
                 itemId.Value = 0;
                 return;
             }
+        }
+    }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Item"))
+        {
+            m_itemInRange = collision.gameObject;
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Item"))
+        {
+            m_itemInRange = null;
         }
     }
 

@@ -488,14 +488,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b116f6c2f8fc21468120bd203181155, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_changeRound:
-    m_InternalValue: 0
-  numberOfPlayersLeft:
-    m_InternalValue: 0
   m_possessionRoundAmountOfTime: 10
   startGameButton: {fileID: 1800016410}
   NumberOfPlayerLeftGUI: {fileID: 1967360724}
   GameOverUI: {fileID: 518840857}
+  m_changeRound:
+    m_InternalValue: 0
+  numberOfPlayersLeft:
+    m_InternalValue: 0
 --- !u!4 &439277358
 Transform:
   m_ObjectHideFlags: 0
@@ -1877,7 +1877,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 439277357}
         m_TargetAssemblyTypeName: RoundManager, Assembly-CSharp
-        m_MethodName: StartGame
+        m_MethodName: StartPossessionRoundButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2263,7 +2263,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 439277357}
         m_TargetAssemblyTypeName: RoundManager, Assembly-CSharp
-        m_MethodName: ReturnToWaitingRoom
+        m_MethodName: ReturnToWaitingRoomButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

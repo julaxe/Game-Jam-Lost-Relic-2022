@@ -16,6 +16,7 @@ public class PlayerBehavior : NetworkBehaviour
     public GameObject m_CurrentItemPossessed;
     public GameObject m_itemInRange;
     public bool playerLost;
+    [SerializeField] private GameObject m_camera;
 
     //Events
     public static event Action PlayHasItem;
@@ -31,7 +32,11 @@ public class PlayerBehavior : NetworkBehaviour
         {
             SubmitItemIDRequestServerRpc(0);
         }
-        
+        //Creating camera for player
+        if (IsLocalPlayer)
+        {
+            Instantiate(m_camera, this.transform);
+        }
         //Subscribing to events
         RoundManager.NextRound += ChangeRound;
     }

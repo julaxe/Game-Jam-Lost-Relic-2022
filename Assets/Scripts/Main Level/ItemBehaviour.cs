@@ -86,20 +86,34 @@ public class ItemBehaviour : NetworkBehaviour
     {
         ulong senderId = serverRpcParams.Receive.SenderClientId;
 
-        NetworkObject playerRef = GetNetworkObject(senderId).GetComponent<ItemBehaviour>().GetPossessPlayer();
+        NetworkObject playerRef = NetworkManager.SpawnManager.GetPlayerNetworkObject(senderId);
         possessList.Add(playerRef);
     }
 
     [ServerRpc(RequireOwnership = false)]
     void DestroyItem_ServerRpc(ServerRpcParams serverRpcParams = default)
     {
+        foreach (var playerRef in possessList)
+        {
+            DestroyItem_ClientRpc(playerRef.NetworkObjectId);
+        }
         DestroyItem_ClientRpc();
     }
 
     [ClientRpc]
+    void DestroyItem_ClientRpc(ulong playerId)
+    {
+        if (GetNetworkObject(playerId).IsOwner)
+        {
+            GetNetworkObject(playerId).GetComponent<PlayerBehavior>().GameOverForPlayer();
+        }
+        gameObject.SetActive(false);
+    }
+    
+    [ClientRpc]
     void DestroyItem_ClientRpc()
     {
-        Destroy(this.gameObject);
+        gameObject.SetActive(false);
     }
 
     #endregion

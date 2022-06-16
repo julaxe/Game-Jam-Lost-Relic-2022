@@ -10,7 +10,6 @@ public class PlayerBehavior : NetworkBehaviour
     private NetworkObject _networkObject;
     
     //Network Variables
-    public NetworkVariable<int> itemId = new NetworkVariable<int>();
 
     //Variables
     public RoundType m_currentRound;
@@ -36,11 +35,6 @@ public class PlayerBehavior : NetworkBehaviour
     {
         playerLost = false;
         m_currentRound = RoundType.WaitingRoom;
-
-        if (IsOwner)
-        {
-            SubmitItemIDRequestServerRpc(0);
-        }
         //Creating camera for player
         if (IsLocalPlayer)
         {
@@ -52,10 +46,6 @@ public class PlayerBehavior : NetworkBehaviour
     }
     void Update()
     {
-        if (itemId.Value != 0)
-        {
-            RemoveItemFromGame(itemId.Value);
-        } 
     }
     public void OnDestroyPossess(InputValue a)
     {
@@ -111,6 +101,14 @@ public class PlayerBehavior : NetworkBehaviour
         m_itemHeld = m_itemInRange;
         m_itemHeld.GetComponent<ItemBehaviour>().Bind(_networkObject);
     }
+
+    public void GameOverForPlayer()
+    {
+        GameOver?.Invoke();
+        playerLost = true;
+        m_CurrentItemPossessed = null;
+        Debug.Log("GameOver for you!");
+    }
     private void ChangeRound()
     {
         m_currentRound++;
@@ -162,7 +160,6 @@ public class PlayerBehavior : NetworkBehaviour
                     GameOver?.Invoke();
                 }
                 Destroy(tempArray[i].gameObject);
-                itemId.Value = 0;
                 return;
             }
         }
@@ -181,12 +178,6 @@ public class PlayerBehavior : NetworkBehaviour
         {
             m_itemInRange = null;
         }
-    }
-
-    [ServerRpc]
-    void SubmitItemIDRequestServerRpc(int a)
-    {
-        itemId.Value = a;
     }
 
 }

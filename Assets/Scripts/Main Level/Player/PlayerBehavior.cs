@@ -7,6 +7,8 @@ using UnityEngine.InputSystem;
 using System;
 public class PlayerBehavior : NetworkBehaviour
 {
+    private NetworkObject _networkObject;
+    
     //Network Variables
     public NetworkVariable<int> itemId = new NetworkVariable<int>();
 
@@ -24,6 +26,11 @@ public class PlayerBehavior : NetworkBehaviour
     public static event Action PlayHasItem;
     public static event Action GameOver;
 
+
+    private void Awake()
+    {
+        _networkObject = GetComponent<NetworkObject>();
+    }
 
     void Start()
     {
@@ -52,17 +59,18 @@ public class PlayerBehavior : NetworkBehaviour
     }
     public void OnDestroyPossess(InputValue a)
     {
-
+        
+        if (!IsOwner) return;
         if (m_itemHeld == null || playerLost) { return; }
         if (m_currentRound == RoundType.PossessionRound)
         {
             m_CurrentItemPossessed = m_itemHeld;
-            m_CurrentItemPossessed.GetComponent<Item>().AddPlayerToPossessList(this.gameObject);
+            m_CurrentItemPossessed.GetComponent<ItemBehaviour>().AddPlayerToPossessList(_networkObject);
         }
-        else
+        else // destroy round
         {
-            if (IsOwner)
-                SubmitItemIDRequestServerRpc(m_itemHeld.GetComponent<Item>().IdNumber);
+            //we have to change this
+            SubmitItemIDRequestServerRpc(m_itemHeld.GetComponent<Item>().IdNumber);
 
             RemoveItemFromGame(m_itemHeld.GetComponent<Item>().IdNumber);
             m_itemHeld = null;
@@ -92,7 +100,7 @@ public class PlayerBehavior : NetworkBehaviour
     private void PickUpItem()
     {
         m_itemHeld = m_itemInRange;
-        m_itemHeld.GetComponent<ItemBehaviour>().Bind(GetComponent<NetworkObject>());
+        m_itemHeld.GetComponent<ItemBehaviour>().Bind(_networkObject);
     }
     private void ChangeRound()
     {

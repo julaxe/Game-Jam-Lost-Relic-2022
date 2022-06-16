@@ -64,17 +64,26 @@ public class PlayerBehavior : NetworkBehaviour
         if (m_itemHeld == null || playerLost) { return; }
         if (m_currentRound == RoundType.PossessionRound)
         {
-            m_CurrentItemPossessed = m_itemHeld;
-            m_CurrentItemPossessed.GetComponent<ItemBehaviour>().AddPlayerToPossessList(_networkObject);
+            PossesItem();
         }
-        else // destroy round
+        else // hide and seek round
         {
-            //we have to change this
-            SubmitItemIDRequestServerRpc(m_itemHeld.GetComponent<Item>().IdNumber);
-
-            RemoveItemFromGame(m_itemHeld.GetComponent<Item>().IdNumber);
-            m_itemHeld = null;
+            DestroyItem();
         }
+    }
+
+    private void PossesItem()
+    {
+        m_CurrentItemPossessed = m_itemHeld;
+        m_CurrentItemPossessed.GetComponent<ItemBehaviour>().AddPlayerToPossessList();
+    }
+
+    private void DestroyItem()
+    {
+        //SubmitItemIDRequestServerRpc(m_itemHeld.GetComponent<Item>().IdNumber);
+        m_itemHeld.GetComponent<ItemBehaviour>().DestroyItem();
+        //RemoveItemFromGame(m_itemHeld.GetComponent<Item>().IdNumber);
+        m_itemHeld = null;
     }
     public void OnPickup(InputValue a)
     {

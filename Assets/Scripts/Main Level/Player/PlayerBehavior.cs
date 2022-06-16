@@ -45,12 +45,10 @@ public class PlayerBehavior : NetworkBehaviour
     }
     void Update()
     {
-        
-
         if (itemId.Value != 0)
         {
             RemoveItemFromGame(itemId.Value);
-        }
+        } 
     }
     public void OnDestroyPossess(InputValue a)
     {
@@ -87,14 +85,14 @@ public class PlayerBehavior : NetworkBehaviour
 
     private void DropItem()
     {
-        m_itemHeld.GetComponent<Item>().UnbindPlayer();
+        m_itemHeld.GetComponent<ItemBehaviour>().Unbind();
         m_itemHeld = null;
     }
 
     private void PickUpItem()
     {
         m_itemHeld = m_itemInRange;
-        m_itemHeld.GetComponent<Item>().BindPlayer(this.gameObject);
+        m_itemHeld.GetComponent<ItemBehaviour>().Bind(GetComponent<NetworkObject>());
     }
     private void ChangeRound()
     {

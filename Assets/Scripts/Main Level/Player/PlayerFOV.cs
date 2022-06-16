@@ -25,14 +25,14 @@ public class PlayerFOV : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(m_origin);
+        //Debug.Log(m_origin);
 
         float fov = 360;
         
         int raycount = 180;
         float angle = 0f;
         float angleIncrease = fov / raycount;
-        float viewDistance = 5;
+        float viewDistance = 30;
 
 
         Vector3[] vertices = new Vector3[raycount + 2];

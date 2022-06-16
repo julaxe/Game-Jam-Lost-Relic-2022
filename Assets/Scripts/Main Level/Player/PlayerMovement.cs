@@ -13,7 +13,19 @@ public class PlayerMovement : NetworkBehaviour
     private InputAction m_movement, m_destroy, m_pickup;
     [SerializeField] private Vector2 m_InputDirection;
     [SerializeField] private float m_speed;
+    [SerializeField] private PlayerFOV m_fov;
+    [SerializeField] private GameObject m_shadow;
+    
+    private void Start()
+    {
+        if (IsLocalPlayer)
+        {
+            GameObject temp = Instantiate(m_shadow);
+            m_fov = temp.GetComponentInChildren<PlayerFOV>();
+            temp.transform.position = this.transform.position;
+        }
 
+    }
     void UpdateServer()
     {
         if (InputDirection.Value.sqrMagnitude != 0.0f)
@@ -21,7 +33,7 @@ public class PlayerMovement : NetworkBehaviour
             if (InputDirection.Value.x > 0)
             {
                 transform.localScale = new Vector2(-1, 1);
-            } 
+            }
             else if (InputDirection.Value.x < 0)
             {
                 transform.localScale = new Vector2(1, 1);
@@ -29,6 +41,7 @@ public class PlayerMovement : NetworkBehaviour
 
             Vector2 newPos = (Vector2)transform.position + InputDirection.Value * m_speed * Time.deltaTime;
             transform.position = newPos;
+
         }
     }
 
@@ -42,11 +55,21 @@ public class PlayerMovement : NetworkBehaviour
 
     void Update()
     {
+
         if (IsOwner && IsClient)
         {
             UpdateClient();
         }
         UpdateServer();
+        //updating FOV
+        if (IsLocalPlayer)
+        {
+
+            //m_shadow.transform.position = transform.position;
+            m_fov.setOrigin(this.transform.position);
+
+        }
+
     }
 
     public void OnMovement(InputValue a)
@@ -59,6 +82,6 @@ public class PlayerMovement : NetworkBehaviour
     {
         InputDirection.Value = newPosition;
     }
-    
+
 
 }

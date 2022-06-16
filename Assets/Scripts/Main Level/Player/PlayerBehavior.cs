@@ -18,6 +18,8 @@ public class PlayerBehavior : NetworkBehaviour
     public bool playerLost;
     [SerializeField] private GameObject m_camera;
 
+
+
     //Events
     public static event Action PlayHasItem;
     public static event Action GameOver;
@@ -39,9 +41,12 @@ public class PlayerBehavior : NetworkBehaviour
         }
         //Subscribing to events
         RoundManager.NextRound += ChangeRound;
+       
     }
     void Update()
     {
+        
+
         if (itemId.Value != 0)
         {
             RemoveItemFromGame(itemId.Value);

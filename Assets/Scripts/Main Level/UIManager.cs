@@ -19,6 +19,11 @@ public class UIManager : MonoBehaviour
         statusText.text = text;
     }
 
+    public void TogglestatusText(bool text)
+    {
+        statusText.enabled = text;
+    }
+
     public void MatchFound(string message)
     {
         playButton.SetActive(false);

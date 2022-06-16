@@ -223,7 +223,7 @@ public class GameManager : MonoBehaviour
             
             //Finally start host
             NetworkManager.Singleton.StartHost();
-            UpdateState?.Invoke("Waiting for players...");
+            UpdateState?.Invoke("Lobby");
             MatchFound?.Invoke("host");
         }
         catch (LobbyServiceException e)

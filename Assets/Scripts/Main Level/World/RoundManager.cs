@@ -4,6 +4,8 @@ using UnityEngine;
 using System;
 using Unity.Netcode;
 using TMPro;
+using UnityEngine.Events;
+
 public enum RoundType
 {
     WaitingRoom,
@@ -12,6 +14,9 @@ public enum RoundType
     EndGame,
     ResetGame
 }
+
+//Note: Move UI stuff in UIManager if there is time
+
 public class RoundManager : NetworkBehaviour
 {
     //Network Variables
@@ -23,7 +28,10 @@ public class RoundManager : NetworkBehaviour
     [SerializeField] private float m_possessionRoundAmountOfTime;
     [SerializeField] private GameObject startGameButton;
     [SerializeField] private GameObject NumberOfPlayerLeftGUI;
+
+
     [SerializeField] private GameObject GameOverUI;
+    private UIManager m_uIManager;
     
     private RoundType m_currentRound;
     private int m_numberOfPlayers;
@@ -31,16 +39,20 @@ public class RoundManager : NetworkBehaviour
     //Events
     public static event Action NextRound;
 
+
     void Start()
     {
         SubmitEventRequestServerRpc(RoundType.WaitingRoom);
         m_currentRound = RoundType.WaitingRoom;
 
         m_numberOfPlayers = 0;
+        m_uIManager = GetComponent<UIManager>();
+        
 
         //Subscribing to events
         PlayerBehavior.PlayHasItem += addNumberPlayers;
         PlayerBehavior.GameOver += PlayerLostRound;
+        
     }
 
     void Update()
@@ -54,6 +66,7 @@ public class RoundManager : NetworkBehaviour
                 //Setting next round variables 
                 m_currentRound = RoundType.PossessionRound;
                 NextRound?.Invoke();
+                m_uIManager.UpdateText("Possession Round");
                 break;
 
             case RoundType.PossessionRound:
@@ -64,12 +77,13 @@ public class RoundManager : NetworkBehaviour
                 NumberOfPlayerLeftGUI.SetActive(true);
                 m_currentRound = RoundType.SeekingRound;
                 NextRound?.Invoke();
+                StartCoroutine(DisableStatusText());
                 break;
 
             case RoundType.SeekingRound:
 
                 //UI for number of players
-                NumberOfPlayerLeftGUI.GetComponent<TextMeshProUGUI>().text = "Number Of Players: " + numberOfPlayersLeft.Value.ToString();
+                NumberOfPlayerLeftGUI.GetComponent<TextMeshProUGUI>().text = ": " + numberOfPlayersLeft.Value.ToString();
                 //Check if next round starts
                 if (m_changeRound.Value == m_currentRound) { return; }
                 //Setting next round variables 
@@ -89,7 +103,7 @@ public class RoundManager : NetworkBehaviour
                 //Setting next round variables 
                 GameOverUI.SetActive(false);
                 m_currentRound = RoundType.WaitingRoom;
-
+                
                 break;
 
             default:
@@ -121,6 +135,7 @@ public class RoundManager : NetworkBehaviour
         StartCoroutine(PossessionRoundTimer());
         Debug.Log("Game Started");
         startGameButton.SetActive(false);
+        m_uIManager.UpdateText("Possession Round");
     }
 
     //Reset everything here
@@ -130,6 +145,9 @@ public class RoundManager : NetworkBehaviour
         m_currentRound = RoundType.WaitingRoom;
         NextRound?.Invoke();
         
+        m_uIManager.UpdateText("Lobby");
+        m_uIManager.TogglestatusText(true);
+
         if (!IsHost) { return; }
         startGameButton.SetActive(true);
         SubmitEventRequestServerRpc(RoundType.WaitingRoom);
@@ -142,7 +160,8 @@ public class RoundManager : NetworkBehaviour
             SubmitEventRequestServerRpc(RoundType.PossessionRound);
 
         yield return new WaitForSeconds(m_possessionRoundAmountOfTime);
-        
+                
+        StartCoroutine(DisableStatusText());
         Debug.Log("Start Seek Round");
         m_currentRound = RoundType.SeekingRound;
         NextRound?.Invoke();
@@ -150,6 +169,13 @@ public class RoundManager : NetworkBehaviour
             SubmitEventRequestServerRpc(RoundType.SeekingRound);
         
         NumberOfPlayerLeftGUI.SetActive(true);
+    }
+
+    IEnumerator DisableStatusText()
+    {
+        m_uIManager.UpdateText("Seeking Round");
+        yield return new WaitForSeconds(10);
+        m_uIManager.TogglestatusText(false);
     }
 
     [ServerRpc]

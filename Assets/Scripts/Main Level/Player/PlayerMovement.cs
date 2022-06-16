@@ -4,9 +4,6 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : NetworkBehaviour
 {
-    public NetworkVariable<Vector2> InputDirection = new NetworkVariable<Vector2>();
-
-
 
     [Header("Input")]
     private PlayerInput m_inputs;
@@ -24,44 +21,32 @@ public class PlayerMovement : NetworkBehaviour
             m_fov = temp.GetComponentInChildren<PlayerFOV>();
             temp.transform.position = this.transform.position;
         }
-
     }
-    void UpdateServer()
+
+    void UpdateScale()
     {
-        if (InputDirection.Value.sqrMagnitude != 0.0f)
+        if (m_InputDirection.sqrMagnitude != 0.0f)
         {
-            if (InputDirection.Value.x > 0)
+            if (m_InputDirection.x > 0)
             {
                 transform.localScale = new Vector2(-1, 1);
             }
-            else if (InputDirection.Value.x < 0)
+            else if (m_InputDirection.x < 0)
             {
                 transform.localScale = new Vector2(1, 1);
             }
-
-            Vector2 newPos = (Vector2)transform.position + InputDirection.Value * m_speed * Time.deltaTime;
-            transform.position = newPos;
-
         }
     }
 
-
-    private void UpdateClient()
+    void UpdateMovement()
     {
-        //Vector2 newPos = (Vector2) transform.position + (m_InputDirection * m_speed * Time.deltaTime);
-        SubmitPositionRequestServerRpc(m_InputDirection);
+        Vector2 newPos = (Vector2)transform.position + m_InputDirection * m_speed * Time.deltaTime;
+        transform.position = newPos;
+        //transform.Translate(m_InputDirection * m_speed * Time.deltaTime);
     }
-
 
     void Update()
     {
-
-        if (IsOwner && IsClient)
-        {
-            UpdateClient();
-        }
-        UpdateServer();
-        //updating FOV
         if (IsLocalPlayer)
         {
 
@@ -69,19 +54,15 @@ public class PlayerMovement : NetworkBehaviour
             m_fov.setOrigin(this.transform.position);
 
         }
-
+        if (!IsClient) return;
+        
+        UpdateScale();
+        UpdateMovement();
     }
 
     public void OnMovement(InputValue a)
     {
         m_InputDirection = a.Get<Vector2>();
     }
-
-    [ServerRpc]
-    void SubmitPositionRequestServerRpc(Vector2 newPosition)
-    {
-        InputDirection.Value = newPosition;
-    }
-
-
+    
 }

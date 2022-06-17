@@ -14,27 +14,32 @@ using Unity.Services.Relay.Models;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
+using TMPro;
+using System.Text;
 
 public class GameManager : MonoBehaviour
 {
     // Singleton
     public static GameManager _instance;
     public static GameManager Instance => _instance;
-    
+
     private string _lobbyId;
 
     private RelayHostData _hostData;
     private RelayJoinData _joinData;
-    
+
     public bool IsRelayEnabled => Transport != null &&
                                   Transport.Protocol == UnityTransport.ProtocolType.RelayUnityTransport;
     public UnityTransport Transport => NetworkManager.Singleton.gameObject.GetComponent<UnityTransport>();
 
-    
+
     //Setup events
     public UnityAction<string> UpdateState;
     public UnityAction<string> MatchFound;
-    
+
+    public GameObject m_inputFieldPassword;
+    public string currentPassword;
+
     private void Awake()
     {
         // just a basic singleton
@@ -51,16 +56,22 @@ public class GameManager : MonoBehaviour
     {
         //initialize unity services
         await UnityServices.InitializeAsync();
-        
+
         //Setup events listeners
         SetupEvents();
-        
+
         //Unity Login
         await SignInAnonymouslyAsync();
+
+        NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;
+        //NetworkManager.Singleton.OnClientConnectedCallback += HandleHostConnected;
+
     }
 
+
+
     #region UnityLogin
-    
+
     void SetupEvents()
     {
         AuthenticationService.Instance.SignedIn += () =>
@@ -96,90 +107,159 @@ public class GameManager : MonoBehaviour
             throw;
         }
     }
-    
+
 
     #endregion
 
     #region Lobby
-    
+    public static async Task<RelayJoinData> JoinGame(string joinCode)
+    {
+        //Initialize the Unity Services engine
+        await UnityServices.InitializeAsync();
+        //Always authenticate your users beforehand
+        if (!AuthenticationService.Instance.IsSignedIn)
+        {
+            //If not already logged, log the user in
+            await AuthenticationService.Instance.SignInAnonymouslyAsync();
+        }
+
+        //Ask Unity Services for allocation data based on a join code
+        JoinAllocation allocation = await Unity.Services.Relay.RelayService.Instance.JoinAllocationAsync(joinCode);
+
+        //Populate the joining data
+        RelayJoinData data = new RelayJoinData
+        {
+            // WARNING allocation.RelayServer is deprecated. It's best to read from ServerEndpoints.
+            IPv4Address = allocation.RelayServer.IpV4,
+            Port = (ushort)allocation.RelayServer.Port,
+
+            AllocationID = allocation.AllocationId,
+            AllocationIDBytes = allocation.AllocationIdBytes,
+            ConnectionData = allocation.ConnectionData,
+            HostConnectionData = allocation.HostConnectionData,
+            Key = allocation.Key,
+        };
+        return data;
+    }
     public async void FindMatch()
     {
-        Debug.Log("Looking for a lobby...");
+        RelayJoinData A = await JoinGame(GetInputPassword());
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(
+                    A.IPv4Address,
+                    A.Port,
+                    A.AllocationIDBytes,
+                    A.Key,
+                    A.ConnectionData,
+                    A.HostConnectionData);
 
-        UpdateState?.Invoke("Looking for a lobby");
-        try
-        {
-            //looking for a lobby
-            
-            // Add options to the matchmaking (mode, rank, etc...)
-            QuickJoinLobbyOptions options = new QuickJoinLobbyOptions();
-            
-            // Quick-join a random lobby
-            Lobby lobby = await Lobbies.Instance.QuickJoinLobbyAsync(options);
-            
-            Debug.Log($"Joined lobby: {lobby.Id}");
-            Debug.Log($"Lobby Players: {lobby.Players.Count}");
-            
-            //Retrieve the Relay code previously set in the create match
-            string joinCode = lobby.Data["joinCode"].Value;
-            
-            Debug.Log($"Received code: {joinCode}");
-
-            JoinAllocation allocation = await Relay.Instance.JoinAllocationAsync(joinCode);
-            
-            // Create Object
-            _joinData = new RelayJoinData
-            {
-                Key = allocation.Key,
-                Port = (ushort) allocation.RelayServer.Port,
-                AllocationID = allocation.AllocationId,
-                AllocationIDBytes = allocation.AllocationIdBytes,
-                ConnectionData = allocation.ConnectionData,
-                HostConnectionData = allocation.HostConnectionData,
-                IPv4Address = allocation.RelayServer.IpV4
-            };
-            
-            //Set transport data
-            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(
-                _joinData.IPv4Address,
-                _joinData.Port,
-                _joinData.AllocationIDBytes,
-                _joinData.Key,
-                _joinData.ConnectionData,
-                _joinData.HostConnectionData);
-            
-            // Finally start the client
-            NetworkManager.Singleton.StartClient();
-            UpdateState?.Invoke("Match found!");
-            MatchFound?.Invoke("client");
-        }
-        catch (LobbyServiceException e)
-        {
-            UpdateState?.Invoke("Couldn't find a lobby - creating a lobby");
-            Debug.Log($"Cannot find a lobby: {e}");
-            CreateMatch();
-        }
+        NetworkManager.Singleton.StartClient();
     }
 
-    private async void CreateMatch()
+    //public async void FindMatch()
+    //{
+
+
+
+    //    Debug.Log("Looking for a lobby...");
+
+    //    //if (InputPasswordEmpty())
+    //    //{
+    //    //    UpdateState?.Invoke("Input A Password");
+    //    //    return;
+    //    //}
+
+
+
+
+    //    UpdateState?.Invoke("Looking for a lobby");
+    //    try
+    //    {
+    //        //looking for a lobby
+
+    //        // Add options to the matchmaking (mode, rank, etc...)
+    //        JoinLobbyByCodeOptions options = new JoinLobbyByCodeOptions();
+
+
+
+    //        // Quick-join a random lobby
+    //        Lobby lobby = await Lobbies.Instance.JoinLobbyByCodeAsync(GetInputPassword(), options);
+
+
+
+    //        Debug.Log($"Joined lobby: {lobby.Id}");
+    //        Debug.Log($"Lobby Players: {lobby.Players.Count}");
+
+    //        //Retrieve the Relay code previously set in the create match
+    //        string joinCode = lobby.Data["joinCode"].Value;
+
+    //        Debug.Log($"Received code: {joinCode}");
+
+    //        JoinAllocation allocation = await Relay.Instance.JoinAllocationAsync(joinCode);
+
+    //        // Create Object
+    //        _joinData = new RelayJoinData
+    //        {
+    //            Key = allocation.Key,
+    //            Port = (ushort)allocation.RelayServer.Port,
+    //            AllocationID = allocation.AllocationId,
+    //            AllocationIDBytes = allocation.AllocationIdBytes,
+    //            ConnectionData = allocation.ConnectionData,
+    //            HostConnectionData = allocation.HostConnectionData,
+    //            IPv4Address = allocation.RelayServer.IpV4
+    //        };
+
+    //        //Set transport data
+    //        NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(
+    //            _joinData.IPv4Address,
+    //            _joinData.Port,
+    //            _joinData.AllocationIDBytes,
+    //            _joinData.Key,
+    //            _joinData.ConnectionData,
+    //            _joinData.HostConnectionData);
+
+    //        //NetworkManager.Singleton.NetworkConfig.ConnectionData = Encoding.ASCII.GetBytes(GetInputPassword());
+
+
+    //        // Finally start the client
+    //        NetworkManager.Singleton.StartClient();
+
+
+
+
+    //    }
+    //    catch (LobbyServiceException e)
+    //    {
+    //        UpdateState?.Invoke("Couldn't find a lobby - creating a lobby");
+    //        Debug.Log($"Cannot find a lobby: {e}");
+    //        //CreateMatch();
+    //    }
+    //}
+
+    public async void CreateMatch()
     {
         Debug.Log("Creating a new lobby...");
 
+        if (InputPasswordEmpty())
+        {
+            UpdateState?.Invoke("Input A Password");
+            return;
+        }
+
         //External connections
         int maxConnections = 5;
-        
+
         try
         {
-            
+
             Debug.Log("Creating Relay Object...");
             //Create Relay object
 
             Allocation allocation = await Relay.Instance.CreateAllocationAsync(maxConnections);
-            
+
             _hostData = new RelayHostData
             {
                 Key = allocation.Key,
-                Port = (ushort) allocation.RelayServer.Port,
+                Port = (ushort)allocation.RelayServer.Port,
                 AllocationID = allocation.AllocationId,
                 AllocationIDBytes = allocation.AllocationIdBytes,
                 ConnectionData = allocation.ConnectionData,
@@ -203,16 +283,16 @@ public class GameManager : MonoBehaviour
                         value: _hostData.JoinCode)
                 },
             };
-            
+
             var lobby = await Lobbies.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
             _lobbyId = lobby.Id;
             Debug.Log($"Created lobby: {lobby.Id}");
-            
+
             //Heart beat the lobby every 15 seconds.
             StartCoroutine(HeartbeatLobbyCoroutine(lobby.Id, 15));
-            
+
             //Now that the Relay and Lobby are set...
-            
+
             //Set Transports data
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(
                 _hostData.IPv4Address,
@@ -221,10 +301,15 @@ public class GameManager : MonoBehaviour
                 _hostData.Key,
                 _hostData.ConnectionData);
             
+            currentPassword = _hostData.JoinCode;
+            //NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;
+
+
+
             //Finally start host
             NetworkManager.Singleton.StartHost();
-            UpdateState?.Invoke("Lobby");
-            MatchFound?.Invoke("host");
+
+
         }
         catch (LobbyServiceException e)
         {
@@ -232,6 +317,43 @@ public class GameManager : MonoBehaviour
             throw;
         }
     }
+
+    private void ApprovalCheck(byte[] connectionData, ulong clientId, NetworkManager.ConnectionApprovedDelegate callBack)
+    {
+        string password = Encoding.ASCII.GetString(connectionData);
+
+
+
+        bool approveConnection = password == currentPassword;
+
+        callBack(true, null, approveConnection, null, null);
+    }
+
+    public bool InputPasswordEmpty()
+    {
+        return string.IsNullOrEmpty(m_inputFieldPassword.GetComponent<TMP_InputField>().text);
+    }
+
+    public string GetInputPassword()
+    {
+        return m_inputFieldPassword.GetComponent<TMP_InputField>().text;
+    }
+
+    private void HandleServerStarted(ulong clientId)
+    {
+        UpdateState?.Invoke(currentPassword);
+        MatchFound?.Invoke("host");
+    }
+
+    private void HandleClientConnected(ulong clientId)
+    {
+        if (clientId == NetworkManager.Singleton.LocalClientId)
+        {
+            UpdateState?.Invoke(currentPassword);
+            MatchFound?.Invoke("host");
+        }
+    }
+
 
     IEnumerator HeartbeatLobbyCoroutine(string lobbyId, float waitTimeSeconds)
     {
@@ -250,6 +372,12 @@ public class GameManager : MonoBehaviour
     {
         //We need to delete the lobby when we're not using it
         Lobbies.Instance.DeleteLobbyAsync(_lobbyId);
+
+        if (NetworkManager.Singleton == null) { return; }
+
+        NetworkManager.Singleton.OnClientConnectedCallback -= HandleClientConnected;
+        //NetworkManager.Singleton.OnServerStarted -= HandleServerStarted;
+
     }
 
     #endregion
@@ -268,7 +396,7 @@ public class GameManager : MonoBehaviour
         public byte[] ConnectionData;
         public byte[] Key;
     }
-    
+
     public struct RelayJoinData
     {
         public string JoinCode;

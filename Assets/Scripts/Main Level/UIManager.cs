@@ -6,12 +6,15 @@ using UnityEngine;
 public class UIManager : MonoBehaviour
 {
     public TextMeshProUGUI statusText;
-    public GameObject playButton;
+    public GameObject joinGameUI;
     public GameObject startGameButton;
+    public GameObject m_inputFieldPassword;
+
     void Start()
     {
         GameManager.Instance.UpdateState += UpdateText;
         GameManager.Instance.MatchFound += MatchFound;
+
     }
 
     public void UpdateText(string text)
@@ -26,10 +29,11 @@ public class UIManager : MonoBehaviour
 
     public void MatchFound(string message)
     {
-        playButton.SetActive(false);
+        joinGameUI.SetActive(false);
         if (message == "host")
         {
             startGameButton.SetActive(true);
         }
     }
+
 }

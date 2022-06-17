@@ -37,9 +37,14 @@ public class ItemBehaviour : NetworkBehaviour
         UpdateLayer_ServerRpc(false);
     }
     
-    public void AddPlayerToPossessList(NetworkObject player)
+    public void AddPlayerToPossessList()
     {
-        possessList.Add(player);
+        AddPlayerToPossessList_ServerRpc();
+    }
+
+    public NetworkObject GetPossessPlayer()
+    {
+        return _playerRef;
     }
 
     public List<NetworkObject> GetPossessList()
@@ -47,6 +52,10 @@ public class ItemBehaviour : NetworkBehaviour
         return possessList;
     }
 
+    public void DestroyItem()
+    {
+        DestroyItem_ServerRpc();
+    }
     #region Server-Client
     [ServerRpc(RequireOwnership = false)]
     void UpdatePositionWithPlayer_ServerRpc(Vector3 position)
@@ -71,7 +80,41 @@ public class ItemBehaviour : NetworkBehaviour
     {
         _spriteRenderer.sortingLayerName = top ? "HeldItem" : "Default";
     }
+
+    [ServerRpc(RequireOwnership = false)]
+    void AddPlayerToPossessList_ServerRpc(ServerRpcParams serverRpcParams = default)
+    {
+        ulong senderId = serverRpcParams.Receive.SenderClientId;
+
+        NetworkObject playerRef = NetworkManager.SpawnManager.GetPlayerNetworkObject(senderId);
+        possessList.Add(playerRef);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    void DestroyItem_ServerRpc(ServerRpcParams serverRpcParams = default)
+    {
+        foreach (var playerRef in possessList)
+        {
+            DestroyItem_ClientRpc(playerRef.NetworkObjectId);
+        }
+        DestroyItem_ClientRpc();
+    }
+
+    [ClientRpc]
+    void DestroyItem_ClientRpc(ulong playerId)
+    {
+        if (GetNetworkObject(playerId).IsOwner)
+        {
+            GetNetworkObject(playerId).GetComponent<PlayerBehavior>().GameOverForPlayer();
+        }
+        gameObject.SetActive(false);
+    }
     
+    [ClientRpc]
+    void DestroyItem_ClientRpc()
+    {
+        gameObject.SetActive(false);
+    }
 
     #endregion
     

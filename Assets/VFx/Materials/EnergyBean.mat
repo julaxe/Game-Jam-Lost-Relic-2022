@@ -21,7 +21,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BeanNoise:
-        m_Texture: {fileID: 2800000, guid: a3201cb7ad2b6314c8b733cc5bb5f5be, type: 3}
+        m_Texture: {fileID: 2800000, guid: 738522be63b248c4f8efe0a1a09a7e20, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
@@ -49,7 +49,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTexture:
-        m_Texture: {fileID: 2800000, guid: ea784ce7fdd2c494e925e23005044c04, type: 3}
+        m_Texture: {fileID: 2800000, guid: f8e203dbf7419a2469a3ce37ed432e73, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -64,12 +64,16 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_b34191b0c6f24b569e344d91ad50c56a_Texture_1:
+        m_Texture: {fileID: 2800000, guid: fd70b9827735f40459ada131e46c9769, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _SampleTexture2D_bf6f41bef158452c9e2cdebe074dbd8c_Texture_1:
         m_Texture: {fileID: 2800000, guid: a9efa76ffa64c274fb9adaa8853da247, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SampleTexture2D_e424d6df228b4403b8442d16332a987e_Texture_1:
-        m_Texture: {fileID: 2800000, guid: a9efa76ffa64c274fb9adaa8853da247, type: 3}
+        m_Texture: {fileID: 2800000, guid: 7db2417a68b28bf4eb3840ec2baea79e, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
@@ -86,7 +90,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _BeanSpeed: 0.1
+    - _BeanSpeed: -0.1
     - _BumpScale: 1
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
@@ -96,9 +100,10 @@ Material:
     - _GlossyReflections: 1
     - _Metallic: 0
     - _Mode: 0
-    - _NoiseSpeed: -0.3
+    - _NoiseSpeed: 0.1
     - _OcclusionStrength: 1
     - _Parallax: 0.02
+    - _PossesProgression: 1.0031312
     - _QueueControl: 0
     - _QueueOffset: 0
     - _SmoothnessTextureChannel: 0
@@ -106,10 +111,12 @@ Material:
     - _SrcBlend: 1
     - _UVSec: 0
     - _ZWrite: 1
+    - _alphaClip: 0.5
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _MainColor: {r: 0, g: 2.0705884, b: 2.9960785, a: 0}
+    - _HelixColor: {r: 0.002428216, g: 0.003676507, b: 0.002428216, a: 0}
+    - _MainColor: {r: 0.02009804, g: 0.027941177, b: 0.02009804, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &8774140219487040396
 MonoBehaviour:

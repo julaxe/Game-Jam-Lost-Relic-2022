@@ -2,44 +2,59 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ConnectionBeanTEst : MonoBehaviour
+public class PlayerVFxController : MonoBehaviour
 {
-    // Start is called before the first frame update
-    public GameObject BeanStart;
-    public GameObject BeanEnd;
-    public GameObject Bean;
-    private float distance;
-    private float angle;
-
-    private SpriteRenderer beanSpriteRenderer;
-    public Material linkMaterial;
-
-    public GameObject LinkCircle;
-
-    bool isPossing = false;
-    float fillAmountLink = -0.1f;
+    [SerializeField]
+    private GameObject BeanStart;
+    [SerializeField]
+    private GameObject BeanEnd;
+    [SerializeField]
+    private GameObject Bean;
+    [SerializeField]
+    private GameObject LinkCircle;
 
     public ParticleSystem Flash;
     public ParticleSystem Smoke;
 
+
+    private SpriteRenderer beanSpriteRenderer;
+    [SerializeField]
+    private Material linkMaterial;
+
+    private float distance;
+    private float angle;
+
+
+    private bool isPossing = false;
+    private float fillAmountLink = -0.1f;
+
+    
+
     void Start()
     {
+        BeanStart = gameObject;
+        Bean = transform.Find("ConnectionBean").gameObject;
+        LinkCircle = transform.Find("VFx_Connection").gameObject;
+        Flash = transform.Find("Flash_VFx").GetComponent<ParticleSystem>();
+        Smoke = transform.Find("Smoke_VFx").GetComponent<ParticleSystem>();
+
         beanSpriteRenderer = Bean.GetComponent<SpriteRenderer>();
         linkMaterial.SetFloat("_PossesProgression", fillAmountLink);
         LinkCircle.SetActive(false);
 
-        Invoke("StartLink", 2.0f);
+        StartLink(BeanEnd);
     }
 
     // Update is called once per frame
     void Update()
     {
-
-        UpdateLinkTransform();
-
-        if (isPossing)
+        if (BeanEnd)
         {
-            Possessing();
+            UpdateLinkTransform();
+            if (isPossing)
+            {
+                Possessing();
+            }
         }
     }
 
@@ -60,8 +75,9 @@ public class ConnectionBeanTEst : MonoBehaviour
 
     }
 
-    public void StartLink()
+    public void StartLink(GameObject possesedItem)
     {
+        BeanEnd = possesedItem;
         isPossing = true;
     }
 
@@ -78,6 +94,7 @@ public class ConnectionBeanTEst : MonoBehaviour
             Flash.Play();
             Smoke.Play();
 
+            BeanEnd.GetComponent<ItemVFxController>().PlayVFx();
             Invoke("ShowCircle", 0.2f);
         }
     }

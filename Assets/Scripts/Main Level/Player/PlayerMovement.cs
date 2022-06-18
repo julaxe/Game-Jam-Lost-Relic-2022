@@ -10,7 +10,7 @@ public class PlayerMovement : NetworkBehaviour
     private InputAction m_movement, m_destroy, m_pickup;
     [SerializeField] private Vector2 m_InputDirection;
     [SerializeField] private float m_speed;
-    [SerializeField] private PlayerFOV m_fov;
+    //[SerializeField] private PlayerFOV m_fov;
     [SerializeField] private GameObject m_shadow;
     
     private void Start()
@@ -18,7 +18,7 @@ public class PlayerMovement : NetworkBehaviour
         if (IsLocalPlayer)
         {
             GameObject temp = Instantiate(m_shadow);
-            m_fov = temp.GetComponentInChildren<PlayerFOV>();
+            //m_fov = temp.GetComponentInChildren<PlayerFOV>();
             temp.transform.position = this.transform.position;
         }
     }
@@ -51,7 +51,7 @@ public class PlayerMovement : NetworkBehaviour
         {
 
             //m_shadow.transform.position = transform.position;
-            m_fov.setOrigin(this.transform.position);
+            //m_fov.setOrigin(this.transform.position);
 
         }
         if (!IsClient) return;

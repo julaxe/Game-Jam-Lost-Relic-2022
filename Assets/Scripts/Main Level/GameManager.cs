@@ -162,6 +162,61 @@ public class GameManager : MonoBehaviour
         NetworkManager.Singleton.StartClient();
     }
 
+    public async void QuickJoinLobby()
+    {
+        //looking for a lobby
+
+        // Add options to the matchmaking (mode, rank, etc...)
+        QuickJoinLobbyOptions options = new QuickJoinLobbyOptions();
+
+
+
+        // Quick-join a random lobby
+        Lobby lobby = await Lobbies.Instance.QuickJoinLobbyAsync(options);
+
+
+
+        Debug.Log($"Joined lobby: {lobby.Id}");
+        Debug.Log($"Lobby Players: {lobby.Players.Count}");
+
+        //Retrieve the Relay code previously set in the create match
+        string joinCode = lobby.Data["joinCode"].Value;
+
+        Debug.Log($"Received code: {joinCode}");
+
+        JoinAllocation allocation = await Relay.Instance.JoinAllocationAsync(joinCode);
+
+        // Create Object
+        _joinData = new RelayJoinData
+        {
+            Key = allocation.Key,
+            Port = (ushort)allocation.RelayServer.Port,
+            AllocationID = allocation.AllocationId,
+            AllocationIDBytes = allocation.AllocationIdBytes,
+            ConnectionData = allocation.ConnectionData,
+            HostConnectionData = allocation.HostConnectionData,
+            IPv4Address = allocation.RelayServer.IpV4
+        };
+
+        //Set transport data
+        NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(
+            _joinData.IPv4Address,
+            _joinData.Port,
+            _joinData.AllocationIDBytes,
+            _joinData.Key,
+            _joinData.ConnectionData,
+            _joinData.HostConnectionData);
+
+        //NetworkManager.Singleton.NetworkConfig.ConnectionData = Encoding.ASCII.GetBytes(GetInputPassword());
+
+
+        // Finally start the client
+        NetworkManager.Singleton.StartClient();
+
+
+    }
+
+
     //public async void FindMatch()
     //{
 
@@ -345,12 +400,13 @@ public class GameManager : MonoBehaviour
         if (clientId == NetworkManager.Singleton.LocalClientId)
         {
             UpdateState?.Invoke("Lobby");
-            LobbyCode?.Invoke(currentLobbyCode);
+            
+            MatchFound?.Invoke("host");
 
         }
-        if (NetworkManager.Singleton.IsHost)
+        if (!NetworkManager.Singleton.IsHost)
         {
-            MatchFound?.Invoke("host");
+            LobbyCode?.Invoke(currentLobbyCode);
         }
 
     }

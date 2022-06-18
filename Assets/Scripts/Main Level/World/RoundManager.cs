@@ -24,7 +24,7 @@ public class RoundManager : NetworkBehaviour
     public static RoundManager Instance { get; private set; }
     //Variables
     [Header("Round Settings")]
-    [SerializeField] private float m_possessionRoundAmountOfTime;
+    [SerializeField] private int m_possessionRoundAmountOfTime;
 
     private UIManager m_uIManager;
     
@@ -55,51 +55,7 @@ public class RoundManager : NetworkBehaviour
 
     void Update()
     {
-        // switch (m_currentRound)
-        // {
-        //     case RoundType.WaitingRoom:
-        //         
-        //         //Setting next round variables 
-        //         m_currentRound = RoundType.PossessionRound;
-        //         NextRound?.Invoke();
-        //         
-        //         break;
-        //
-        //     case RoundType.PossessionRound:
-        //         
-        //         //Setting next round variables 
-        //         NumberOfPlayerLeftGUI.SetActive(true);
-        //         m_currentRound = RoundType.SeekingRound;
-        //         NextRound?.Invoke();
-        //         StartCoroutine(DisableStatusText());
-        //         break;
-        //
-        //     case RoundType.SeekingRound:
-        //
-        //         //UI for number of players
-        //         NumberOfPlayerLeftGUI.GetComponent<TextMeshProUGUI>().text = ": " + numberOfPlayersLeft.Value.ToString();
-        //         
-        //         //Setting next round variables 
-        //         m_currentRound = RoundType.EndGame;
-        //         NextRound?.Invoke();
-        //         NumberOfPlayerLeftGUI.SetActive(false);
-        //         GameOverUI.SetActive(true);
-        //         break;
-        //
-        //     case RoundType.EndGame:
-        //         break;
-        //
-        //     case RoundType.ResetGame:
-        //         
-        //         //Setting next round variables 
-        //         GameOverUI.SetActive(false);
-        //         m_currentRound = RoundType.WaitingRoom;
-        //         
-        //         break;
-        //
-        //     default:
-        //         break;
-        // }
+        
     }
 
     
@@ -116,7 +72,7 @@ public class RoundManager : NetworkBehaviour
             case RoundType.PossessionRound:
                 Debug.Log("Game Started");
                 m_uIManager.ChangeRoundUI(RoundType.PossessionRound);
-                StartCoroutine(CountDown(10, StartSeekingRound));
+                StartCoroutine(CountDown(m_possessionRoundAmountOfTime, StartSeekingRound));
                 break;
             case RoundType.SeekingRound:
                 m_numberOfPlayers = NetworkManager.ConnectedClients.Count;
@@ -144,12 +100,12 @@ public class RoundManager : NetworkBehaviour
     
     IEnumerator CountDown(int seconds, Action func = null)
     {
-        int counter = seconds;
-        while (counter > 0)
+        gameTime = seconds;
+        while (gameTime > 0)
         {
             yield return new WaitForSecondsRealtime(1);
-            counter--;
-            Debug.Log(counter);
+            gameTime--;
+            Debug.Log(gameTime);
         }
         //do after countdown is done
         func?.Invoke();

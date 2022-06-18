@@ -38,6 +38,7 @@ public class RoundManager : NetworkBehaviour
 
     //Events
     public static event Action NextRound;
+    public static int gameTime = 0;
 
     private void Awake()
     {
@@ -108,7 +109,18 @@ public class RoundManager : NetworkBehaviour
                 break;
         }
     }
-    
+
+    IEnumerator CountDown(int seconds, Action func)
+    {
+        int counter = seconds;
+        while (counter > 0)
+        {
+            yield return new WaitForSecondsRealtime(1);
+            counter--;
+        }
+        //do after countdown is done
+        func();
+    }
     public void addNumberPlayers()
     {
         if(!IsHost) { return; }

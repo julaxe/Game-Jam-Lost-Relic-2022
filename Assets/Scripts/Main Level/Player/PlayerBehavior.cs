@@ -140,13 +140,11 @@ public class PlayerBehavior : NetworkBehaviour
                     {
                         tempDistance = Vector3.Distance(transform.position, tempArray[i].transform.position);
                         m_CurrentItemPossessed = tempArray[i];
-
                     }
                 }
+                m_CurrentItemPossessed.GetComponent<ItemBehaviour>().AddPlayerToPossessList();
             }
-            m_CurrentItemPossessed.GetComponent<Item>().AddPlayerToPossessList(this.gameObject);
             PlayHasItem?.Invoke();
-
         }
 
     }

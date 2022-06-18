@@ -33,26 +33,24 @@ public class RoundManager : NetworkBehaviour
     [SerializeField] private GameObject GameOverUI;
     private UIManager m_uIManager;
     
-    private RoundType m_currentRound;
-    private int m_numberOfPlayers;
+    private RoundType m_currentRound = RoundType.WaitingRoom;
+    private int m_numberOfPlayers = 0;
 
     //Events
     public static event Action NextRound;
 
+    private void Awake()
+    {
+        m_uIManager = GetComponent<UIManager>();
+    }
 
     void Start()
     {
         SubmitEventRequestServerRpc(RoundType.WaitingRoom);
-        m_currentRound = RoundType.WaitingRoom;
-
-        m_numberOfPlayers = 0;
-        m_uIManager = GetComponent<UIManager>();
-        
 
         //Subscribing to events
         PlayerBehavior.PlayHasItem += addNumberPlayers;
         PlayerBehavior.GameOver += PlayerLostRound;
-        
     }
 
     void Update()

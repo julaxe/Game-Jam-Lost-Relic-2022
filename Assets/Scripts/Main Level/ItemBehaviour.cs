@@ -7,13 +7,12 @@ using UnityEngine;
 public class ItemBehaviour : NetworkBehaviour
 {
     private NetworkObject _playerRef;
-    private SpriteRenderer _spriteRenderer;
+    [SerializeField] private SpriteRenderer image;
     
     public List<NetworkObject> possessList;
 
     private void Awake()
     {
-        _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         possessList = new List<NetworkObject>();
     }
 
@@ -78,7 +77,7 @@ public class ItemBehaviour : NetworkBehaviour
     [ClientRpc]
     void UpdateLayer_ClientRpc(bool top)
     {
-        _spriteRenderer.sortingLayerName = top ? "HeldItem" : "Default";
+        image.sortingLayerName = top ? "HeldItem" : "Default";
     }
 
     [ServerRpc(RequireOwnership = false)]

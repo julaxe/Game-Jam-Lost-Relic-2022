@@ -13,7 +13,7 @@ public class UIManager : MonoBehaviour
     public GameObject m_inputFieldPassword;
     public GameObject m_popMenu;
     public TextMeshProUGUI m_CodeText;
-    public bool m_isPopupMenuOpen;
+    public bool m_isPopupMenuOpen = false;
     public string m_LobbyCode;
 
 
@@ -22,10 +22,6 @@ public class UIManager : MonoBehaviour
         GameManager.Instance.UpdateState += UpdateText;
         GameManager.Instance.MatchFound += MatchFound;
         GameManager.Instance.LobbyCode += UpdateLobbyCode;
-
-
-        m_isPopupMenuOpen = false;
-
     }
 
     public void UpdateText(string text)
@@ -55,8 +51,6 @@ public class UIManager : MonoBehaviour
 
     public void OnPopMenu(InputValue a)
     {
-
-
         if (m_isPopupMenuOpen)
         {
             m_popMenu.SetActive(false);

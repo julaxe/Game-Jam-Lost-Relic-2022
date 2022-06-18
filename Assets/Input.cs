@@ -53,6 +53,15 @@ public partial class @Input : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PopMenu"",
+                    ""type"": ""Button"",
+                    ""id"": ""5cec8dcb-7049-40de-a3d6-c8e8f6be8ff1"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -132,6 +141,17 @@ public partial class @Input : IInputActionCollection2, IDisposable
                     ""action"": ""DestroyPossess"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ea562973-c4bd-47b5-bbf9-d56d8c2ed04b"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PopMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -143,6 +163,7 @@ public partial class @Input : IInputActionCollection2, IDisposable
         m_Player_Movement = m_Player.FindAction("Movement", throwIfNotFound: true);
         m_Player_Pickup = m_Player.FindAction("Pickup", throwIfNotFound: true);
         m_Player_DestroyPossess = m_Player.FindAction("DestroyPossess", throwIfNotFound: true);
+        m_Player_PopMenu = m_Player.FindAction("PopMenu", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -205,6 +226,7 @@ public partial class @Input : IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Movement;
     private readonly InputAction m_Player_Pickup;
     private readonly InputAction m_Player_DestroyPossess;
+    private readonly InputAction m_Player_PopMenu;
     public struct PlayerActions
     {
         private @Input m_Wrapper;
@@ -212,6 +234,7 @@ public partial class @Input : IInputActionCollection2, IDisposable
         public InputAction @Movement => m_Wrapper.m_Player_Movement;
         public InputAction @Pickup => m_Wrapper.m_Player_Pickup;
         public InputAction @DestroyPossess => m_Wrapper.m_Player_DestroyPossess;
+        public InputAction @PopMenu => m_Wrapper.m_Player_PopMenu;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -230,6 +253,9 @@ public partial class @Input : IInputActionCollection2, IDisposable
                 @DestroyPossess.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnDestroyPossess;
                 @DestroyPossess.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnDestroyPossess;
                 @DestroyPossess.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnDestroyPossess;
+                @PopMenu.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPopMenu;
+                @PopMenu.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPopMenu;
+                @PopMenu.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPopMenu;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -243,6 +269,9 @@ public partial class @Input : IInputActionCollection2, IDisposable
                 @DestroyPossess.started += instance.OnDestroyPossess;
                 @DestroyPossess.performed += instance.OnDestroyPossess;
                 @DestroyPossess.canceled += instance.OnDestroyPossess;
+                @PopMenu.started += instance.OnPopMenu;
+                @PopMenu.performed += instance.OnPopMenu;
+                @PopMenu.canceled += instance.OnPopMenu;
             }
         }
     }
@@ -252,5 +281,6 @@ public partial class @Input : IInputActionCollection2, IDisposable
         void OnMovement(InputAction.CallbackContext context);
         void OnPickup(InputAction.CallbackContext context);
         void OnDestroyPossess(InputAction.CallbackContext context);
+        void OnPopMenu(InputAction.CallbackContext context);
     }
 }

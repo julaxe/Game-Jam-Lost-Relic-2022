@@ -36,9 +36,11 @@ public class GameManager : MonoBehaviour
     //Setup events
     public UnityAction<string> UpdateState;
     public UnityAction<string> MatchFound;
+    public UnityAction<string> LobbyCode;
 
-    public GameObject m_inputFieldPassword;
-    public string currentPassword;
+
+    public GameObject m_inputField;
+    public string currentLobbyCode;
 
     private void Awake()
     {
@@ -64,7 +66,6 @@ public class GameManager : MonoBehaviour
         await SignInAnonymouslyAsync();
 
         NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;
-        //NetworkManager.Singleton.OnClientConnectedCallback += HandleHostConnected;
 
     }
 
@@ -141,9 +142,15 @@ public class GameManager : MonoBehaviour
         };
         return data;
     }
-    public async void FindMatch()
+    public async void FindLobbyByCode()
     {
-        RelayJoinData A = await JoinGame(GetInputPassword());
+        if (InputCodeEmpty())
+        {
+            UpdateState?.Invoke("Input a Code");
+            return;
+        }
+
+        RelayJoinData A = await JoinGame(GetInputFieldCode());
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(
                     A.IPv4Address,
                     A.Port,
@@ -151,7 +158,7 @@ public class GameManager : MonoBehaviour
                     A.Key,
                     A.ConnectionData,
                     A.HostConnectionData);
-
+        currentLobbyCode = GetInputFieldCode();
         NetworkManager.Singleton.StartClient();
     }
 
@@ -235,15 +242,9 @@ public class GameManager : MonoBehaviour
     //    }
     //}
 
-    public async void CreateMatch()
+    public async void HostLobbyByCode()
     {
         Debug.Log("Creating a new lobby...");
-
-        if (InputPasswordEmpty())
-        {
-            UpdateState?.Invoke("Input A Password");
-            return;
-        }
 
         //External connections
         int maxConnections = 5;
@@ -301,7 +302,7 @@ public class GameManager : MonoBehaviour
                 _hostData.Key,
                 _hostData.ConnectionData);
             
-            currentPassword = _hostData.JoinCode;
+            currentLobbyCode = _hostData.JoinCode;
             //NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;
 
 
@@ -318,40 +319,40 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void ApprovalCheck(byte[] connectionData, ulong clientId, NetworkManager.ConnectionApprovedDelegate callBack)
+    //private void ApprovalCheck(byte[] connectionData, ulong clientId, NetworkManager.ConnectionApprovedDelegate callBack)
+    //{
+    //    string password = Encoding.ASCII.GetString(connectionData);
+
+
+
+    //    bool approveConnection = password == currentPassword;
+
+    //    callBack(true, null, approveConnection, null, null);
+    //}
+
+    public bool InputCodeEmpty()
     {
-        string password = Encoding.ASCII.GetString(connectionData);
-
-
-
-        bool approveConnection = password == currentPassword;
-
-        callBack(true, null, approveConnection, null, null);
+        return string.IsNullOrEmpty(m_inputField.GetComponent<TMP_InputField>().text);
     }
 
-    public bool InputPasswordEmpty()
+    public string GetInputFieldCode()
     {
-        return string.IsNullOrEmpty(m_inputFieldPassword.GetComponent<TMP_InputField>().text);
-    }
-
-    public string GetInputPassword()
-    {
-        return m_inputFieldPassword.GetComponent<TMP_InputField>().text;
-    }
-
-    private void HandleServerStarted(ulong clientId)
-    {
-        UpdateState?.Invoke(currentPassword);
-        MatchFound?.Invoke("host");
+        return m_inputField.GetComponent<TMP_InputField>().text;
     }
 
     private void HandleClientConnected(ulong clientId)
     {
         if (clientId == NetworkManager.Singleton.LocalClientId)
         {
-            UpdateState?.Invoke(currentPassword);
+            UpdateState?.Invoke("Lobby");
+            LobbyCode?.Invoke(currentLobbyCode);
+
+        }
+        if (NetworkManager.Singleton.IsHost)
+        {
             MatchFound?.Invoke("host");
         }
+
     }
 
 
@@ -376,7 +377,6 @@ public class GameManager : MonoBehaviour
         if (NetworkManager.Singleton == null) { return; }
 
         NetworkManager.Singleton.OnClientConnectedCallback -= HandleClientConnected;
-        //NetworkManager.Singleton.OnServerStarted -= HandleServerStarted;
 
     }
 

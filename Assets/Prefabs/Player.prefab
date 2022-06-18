@@ -269,7 +269,7 @@ MonoBehaviour:
   LinkCircle: {fileID: 0}
   Flash: {fileID: 0}
   Smoke: {fileID: 0}
-  linkMaterial: {fileID: 0}
+  linkMaterial: {fileID: 2100000, guid: 12b9ffe3e71ec4d4da14999bceaca6d0, type: 2}
 --- !u!1001 &829477319707953770
 PrefabInstance:
   m_ObjectHideFlags: 0

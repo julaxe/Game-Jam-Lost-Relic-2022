@@ -12,7 +12,6 @@ public class PlayerBehavior : NetworkBehaviour
     //Network Variables
 
     //Variables
-    public RoundType m_currentRound;
     public GameObject m_itemHeld;
     public GameObject m_CurrentItemPossessed;
     public GameObject m_itemInRange;
@@ -37,14 +36,13 @@ public class PlayerBehavior : NetworkBehaviour
     void Start()
     {
         playerLost = false;
-        m_currentRound = RoundType.WaitingRoom;
         //Creating camera for player
         if (IsLocalPlayer)
         {
             Instantiate(m_camera, this.transform);
         }
         //Subscribing to events
-        RoundManager.NextRound += ChangeRound;
+        RoundManager.Instance.changeRound += ChangeRound;
        
     }
     void Update()
@@ -55,7 +53,7 @@ public class PlayerBehavior : NetworkBehaviour
         
         if (!IsOwner) return;
         if (m_itemHeld == null || playerLost) { return; }
-        if (m_currentRound == RoundType.PossessionRound)
+        if (RoundManager.Instance.currentRound == RoundType.PossessionRound)
         {
             PossesItem();
         }
@@ -116,17 +114,15 @@ public class PlayerBehavior : NetworkBehaviour
     }
     private void ChangeRound()
     {
-        m_currentRound++;
 
-        if (m_currentRound == RoundType.ResetGame)
+        if (RoundManager.Instance.currentRound  == RoundType.ResetGame)
         {
-            m_currentRound = RoundType.WaitingRoom;
             playerLost = false;
             return;
         }
 
 
-        if (m_currentRound == RoundType.SeekingRound)
+        if (RoundManager.Instance.currentRound  == RoundType.SeekingRound)
         {
             if (m_CurrentItemPossessed == null)
             {

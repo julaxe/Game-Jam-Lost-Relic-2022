@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: -8153675911151557357}
   - component: {fileID: -3578845575376168162}
   - component: {fileID: 4824248383376735656}
+  - component: {fileID: 3026837320096780984}
   m_Layer: 8
   m_Name: ItemTemplate
   m_TagString: Item
@@ -94,6 +95,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   image: {fileID: 8765422179170917644}
   possessList: []
+--- !u!114 &3026837320096780984
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5395045993370718745}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05d5b8bd695bb5243a895c451c2bd751, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7509609356318765303
 GameObject:
   m_ObjectHideFlags: 0
@@ -188,14 +201,6 @@ PrefabInstance:
     - target: {fileID: 5919182949476290576, guid: 569fa523e2c5837418dcb0f72557e7dc, type: 3}
       propertyPath: m_RootOrder
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5919182949476290576, guid: 569fa523e2c5837418dcb0f72557e7dc, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 2.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 5919182949476290576, guid: 569fa523e2c5837418dcb0f72557e7dc, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 3.5
       objectReference: {fileID: 0}
     - target: {fileID: 5919182949476290576, guid: 569fa523e2c5837418dcb0f72557e7dc, type: 3}
       propertyPath: m_LocalPosition.x

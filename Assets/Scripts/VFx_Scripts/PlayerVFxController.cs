@@ -60,14 +60,20 @@ public class PlayerVFxController : MonoBehaviour
 
     public void UpdateLinkTransform()
     {
+       
+
         distance = Vector2.Distance(BeanStart.transform.position, BeanEnd.transform.position);
+
+        if (distance == 0) return;
 
         angle = Mathf.Atan((-BeanStart.transform.position.y + BeanEnd.transform.position.y)/ (-BeanStart.transform.position.x + BeanEnd.transform.position.x));
         angle = angle * Mathf.Rad2Deg;
 
         Vector2 position = new Vector2((-BeanStart.transform.position.x + BeanEnd.transform.position.x) * 0.5f, (-BeanStart.transform.position.y + BeanEnd.transform.position.y)*0.5f);
 
+
         Bean.transform.localPosition = position;
+
         Bean.transform.eulerAngles = new Vector3(0.0f, 0.0f, angle);
 
         //half of the distance because the transforme is 2,1,1;

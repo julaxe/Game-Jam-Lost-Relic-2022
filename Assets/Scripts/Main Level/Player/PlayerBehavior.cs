@@ -19,6 +19,8 @@ public class PlayerBehavior : NetworkBehaviour
     public bool playerLost;
     [SerializeField] private GameObject m_camera;
 
+    private PlayerVFxController vFxController;
+
 
 
     //Events
@@ -29,6 +31,7 @@ public class PlayerBehavior : NetworkBehaviour
     private void Awake()
     {
         _networkObject = GetComponent<NetworkObject>();
+        vFxController = GetComponent<PlayerVFxController>();
     }
 
     void Start()
@@ -66,6 +69,8 @@ public class PlayerBehavior : NetworkBehaviour
     {
         m_CurrentItemPossessed = m_itemHeld;
         m_CurrentItemPossessed.GetComponent<ItemBehaviour>().AddPlayerToPossessList();
+
+        vFxController.StartLink(m_CurrentItemPossessed);
     }
 
     private void DestroyItem()
@@ -112,6 +117,7 @@ public class PlayerBehavior : NetworkBehaviour
     private void ChangeRound()
     {
         m_currentRound++;
+
         if (m_currentRound == RoundType.ResetGame)
         {
             m_currentRound = RoundType.WaitingRoom;

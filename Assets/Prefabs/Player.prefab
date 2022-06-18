@@ -449,6 +449,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: VFx_Connection
       objectReference: {fileID: 0}
+    - target: {fileID: 5919182949476290577, guid: 569fa523e2c5837418dcb0f72557e7dc, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 569fa523e2c5837418dcb0f72557e7dc, type: 3}
 --- !u!4 &271438618 stripped
@@ -466,6 +470,22 @@ PrefabInstance:
     - target: {fileID: 7651424025490075330, guid: e65da53afee30564da3d48ea42f86336, type: 3}
       propertyPath: m_Name
       value: ConnectionBean
+      objectReference: {fileID: 0}
+    - target: {fileID: 7651424025490075330, guid: e65da53afee30564da3d48ea42f86336, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7651424025490075331, guid: e65da53afee30564da3d48ea42f86336, type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7651424025490075331, guid: e65da53afee30564da3d48ea42f86336, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7651424025490075331, guid: e65da53afee30564da3d48ea42f86336, type: 3}
+      propertyPath: m_SortingLayerID
+      value: -1408104465
       objectReference: {fileID: 0}
     - target: {fileID: 7651424025490075332, guid: e65da53afee30564da3d48ea42f86336, type: 3}
       propertyPath: m_RootOrder
